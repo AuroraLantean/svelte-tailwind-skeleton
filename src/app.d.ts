@@ -7,3 +7,14 @@ declare namespace App {
 	// interface Error {}
 	// interface Platform {}
 }
+
+declare class Product {
+	id: string    // Stripe ID
+	name: string  // "Coffee"
+	price: number // 5
+}
+
+declare class CartItem {
+	id: string
+	quantity: number
+}

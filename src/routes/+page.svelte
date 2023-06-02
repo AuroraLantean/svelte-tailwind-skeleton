@@ -29,7 +29,7 @@
 
 <div class="container h-full mx-auto gap-8 flex flex-col">
 	<div class="flex items-center justify-between">
-		<h2>Notes</h2>
+		<h2>Note List</h2>
 		<a href="/new" class="btn variant-ghost-primary"> New Note </a>
 	</div>
 
