@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ProductCard from "$lib/productCard.svelte";
+	import ProductCard from "../../components/productCard.svelte";
 	import { get } from "svelte/store";
 	import { cartItems } from "../../store/cart";
 

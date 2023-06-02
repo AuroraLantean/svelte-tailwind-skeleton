@@ -15,7 +15,7 @@
 		Toast,
 		drawerStore
 	} from '@skeletonlabs/skeleton';
-	import Navigation from '$lib/components/Navigation.svelte';
+	import Navigation from '../components/Navigation.svelte';
 
   function drawerOpen(): void {
 		drawerStore.open();

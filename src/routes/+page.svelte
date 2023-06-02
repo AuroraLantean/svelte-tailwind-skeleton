@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { noteStore } from '$lib/stores';
+	import { noteStore } from '../store/notes';
 	import { toastStore, type ModalSettings, modalStore } from '@skeletonlabs/skeleton';
 
 	function deleteNote(noteId: string): void {
