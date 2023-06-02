@@ -18,3 +18,18 @@ declare class CartItem {
 	id: string
 	quantity: number
 }
+
+//-------------------==
+interface CodeSnippetInput {
+	title: string
+	language: string
+	code: string
+}
+
+interface CodeSnippet {
+	title: string
+	language: string
+	code: string
+	favorite: boolean
+	// userCreated : User, createdOn: string
+}

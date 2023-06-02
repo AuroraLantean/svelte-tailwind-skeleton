@@ -12,6 +12,7 @@
 		<li><a href="/new" on:click={drawerClose}>New note</a></li>
 		<li><a href="/contactlist" on:click={drawerClose}>Contact List</a></li>
 		<li><a href="/ecommerce" on:click={drawerClose}>E-Commerce</a></li>
+		<li><a href="/snippet" on:click={drawerClose}>Code Snippet</a></li>
 		<li><a href="/fail" on:click={drawerClose}>Payment failed</a></li>
 		<li><a href="/success" on:click={drawerClose}>Payment Succeeded</a></li>
 	</ul>
