@@ -14,15 +14,6 @@
 	// favorite items
 	// +page.ts to initially load in some example items (mocking a database request)
 
-	const prop = {};
-	function onFormSubmit(): void {
-		console.log('onFormSubmit');
-		modalStore.close();
-	}
-	function onFormCancel(): void {
-		modalStore.close();
-	}
-
 	const modalComponent: ModalComponent = {
 		// Pass a reference to your custom component
 		ref: ModalAddItem,
@@ -55,7 +46,7 @@
 		<div class="text-center py-6">
 			<h2>Items for sale</h2>
 		</div>
-		<button type="button" class="btn btn-sm variant-filled-primary" on:click={() => modalHandler()}>
+		<button type="button" class="btn variant-filled-primary" on:click={() => modalHandler()}>
 			Add Item Modal
 		</button>
 		<a href="/newItem" class="btn variant-filled-primary"> Add Item Page </a>

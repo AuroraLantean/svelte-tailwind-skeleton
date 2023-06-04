@@ -1,0 +1,5 @@
+PRIVATE_URI=http://www.google.com
+PRIVATE_VAR=private_var
+
+PUBLIC_URI=http://www.amazon.com
+PUBLIC_VAR=public_var
