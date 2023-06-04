@@ -23,7 +23,7 @@ export const load = (() => {
         editing: false, checked: false
 			},
 			{
-				title: "2022 CESSNA CITATION LATITUDE",
+				title: "2022 CESSNA CITATION",
 				category: "airplane",
 				description: `Textron Aviation is pleased to present this 2022 Citation Latitude on behalf of the aircraft owner.$43,183,500`,
 				favorite: false, 
