@@ -21,11 +21,14 @@ declare class CartItem {
 
 //-------------------==
 interface ItemFormInput {
+  quantity: number,
 	title: string
 	category: string
 	description: string
 }
 interface ItemForm {
+  id: string,
+  quantity: number,
   title: string
   category: string
   description: string

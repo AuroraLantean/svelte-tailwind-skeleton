@@ -5,6 +5,8 @@
 
 	let tags: string[] = [];
 	const itemDefault = {
+    id: '',
+    quantity: 0,
 		title: '',
 		category: 'car',
 		description: '',

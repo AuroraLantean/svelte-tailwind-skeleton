@@ -8,22 +8,41 @@ export const ItemStore = writable<ItemForm[]>([]); // [itemForm1,itemForm2,etc.]
 // addItem
 export const addItem = (input: ItemFormInput) => {
   const items = get(ItemStore);
+  const uuid = crypto.randomUUID();//only on localhost or https
+  console.log("uuid: " + uuid);
   ItemStore.update(() => { // ItemForm[]
     return [{
-      ...input, favorite: false,
+      ...input, id: uuid, favorite: false,
       editing: false, checked: false
     }, ...items]
   });
 }
+// buyItem
+export const buyItem = (id: string) => {
+  const items = get(ItemStore);
+  console.log("buyItem. id:", id)
+
+  const newItems = items.map((item) => {
+    if(item.quantity === 0) return item;
+    if (item.id === id) {
+      return { ...item, quantity: item.quantity -1 }
+    }
+    return item;
+  });
+  //console.log("newItems: ", newItems)
+  ItemStore.update(() => { 
+    return newItems
+  })
+}
 
 
 // editItem
-export const editItem = (index: number, input: ItemForm) => {
-  console.log("editItem(), index: ", index, ", input: ", input)
+export const editItem = (input: ItemForm) => {
+  //console.log("editItem(), input: ", input)
   const items = get(ItemStore);
 
-  const newItems = items.map((item, ItemIndex) => {
-    if (ItemIndex === index) {
+  const newItems = items.map((item) => {
+    if (item.id === input.id) {
       return { ...input, editing: !item.editing }
     }
     return item;
@@ -35,21 +54,28 @@ export const editItem = (index: number, input: ItemForm) => {
 }
 
 // deleteItem
-export const deleteItem = (index: number) => { // if you have a db, delete by ID?
+export const deleteItem = (id: string) => {
   const items = get(ItemStore);
-  items.splice(index, 1); 
-  ItemStore.update(() => { // ItemForm[]
-    return items;
-  });
+  const newItems = items.reduce((result: ItemForm[], item) => {
+    if (item.id !== id) {
+      result.push(item);
+    }
+    return result;
+  }, []);
+  //items.splice(index, 1); 
+  //console.log("newItems: ", newItems)
+  ItemStore.update(() => { 
+    return newItems
+  })
 }
 
 // toggleFavorite
-export const toggleFavorite = (index: number) => {
+export const toggleFavorite = (id: string) => {
   const items = get(ItemStore);
 
   ItemStore.update(() => { 
-    return items.map((item, ItemIndex) => {
-      if (ItemIndex === index) {
+    return items.map((item) => {
+      if (item.id === id) {
         return { ...item, favorite: !item.favorite }
       }
       return item;
@@ -57,11 +83,11 @@ export const toggleFavorite = (index: number) => {
   });
 }
 
-export const setEditing = (index: number, isEditing: boolean) => {
+export const setEditing = (id: string, isEditing: boolean) => {
   const items = get(ItemStore);
   ItemStore.update(() => {
-    return items.map((item, ItemIndex) => {
-      if (ItemIndex === index) {
+    return items.map((item) => {
+      if (item.id === id) {
         return { ...item, editing: isEditing }
       }
       return item;

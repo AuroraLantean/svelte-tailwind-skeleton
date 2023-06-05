@@ -16,7 +16,7 @@
 	// We've created a custom submit function to pass the response and close the modal.
 	function onFormSubmit(): void {
 		if ($modalStore[0].response) {
-      console.log("onFormSubmit response")
+      //console.log("onFormSubmit response")
       $modalStore[0].response(formData);
     }
 		modalStore.close();

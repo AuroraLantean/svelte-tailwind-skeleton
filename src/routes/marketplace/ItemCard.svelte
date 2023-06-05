@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { CodeBlock } from '@skeletonlabs/skeleton';
   import { toastStore, type ModalSettings, modalStore } from '@skeletonlabs/skeleton';
-	import { deleteItem, editItem, toggleFavorite } from '../../store/items';
+	import { buyItem, deleteItem, editItem, toggleFavorite } from '../../store/items';
 	import InputForm from './InputForm.svelte';
 
 	export let item: ItemForm = {
+    id: '',
+    quantity: 0,
 		title: '',
 		category: '',
 		description: '',
@@ -13,16 +15,14 @@
 		checked: false
 	};
 
-	export let index: number;
-
-  function deleteItemHandler(index: number): void {
+  function deleteItemHandler(id: string): void {
 		const confirmDelete: ModalSettings = {
 			type: 'confirm',
 			title: 'Delete Item',
 			body: 'Are you sure you want to delete this item?',
 			response: (r: boolean) => {
 				if (r) {
-          deleteItem(index)
+          deleteItem(id)
 					toastStore.trigger({
 						message: 'Item deleted successfully',
 						background: 'variant-filled-success'
@@ -49,22 +49,29 @@
       <div class="float-right">
 				<button
 					type="button"
+					class="btn btn-sm variant-filled-tertiary"
+					on:click={() => buyItem(item.id)}
+				>
+					Buy Now
+				</button>
+				<button
+					type="button"
 					class="btn btn-sm variant-filled-secondary"
-					on:click={() => toggleFavorite(index)}
+					on:click={() => toggleFavorite(item.id)}
 				>
 					{item.favorite ? 'Unfavorite' : 'Favorite'}
 				</button>
 				<button
 					type="button"
 					class="btn btn-sm variant-filled-warning"
-					on:click={() => editItem(index, item)}
+					on:click={() => editItem(item)}
 				>
 					{item.editing ? 'Save' : 'Edit'}
 				</button>
 				<button
 					type="button"
 					class="btn btn-sm variant-filled-error"
-					on:click={() => deleteItemHandler(index)}
+					on:click={() => deleteItemHandler(item.id)}
 				>
 					X
 				</button>
@@ -74,7 +81,7 @@
 	
   <section class="p-4">
 		{#if item.editing}
-      <InputForm {item} {index} isNew={false}/>
+      <InputForm {item} isNew={false}/>
 		{:else}
       <CodeBlock language={item.category} code={item.description} />
     {/if}

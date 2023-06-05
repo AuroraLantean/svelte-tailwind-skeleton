@@ -2,6 +2,8 @@
 	import { addItem, editItem } from '../../store/items';
 
   const itemDefault = {
+    id: '',
+    quantity: 0,
 		title: '',
 		category: 'car',
 		description: '',
@@ -10,7 +12,6 @@
 		checked: false
 	};
 	export let item: ItemForm = itemDefault;
-	export let index: number = 0;
 	export let isNew: boolean = true;
   const resetItem = () => { 
     item.title = "";
@@ -60,7 +61,7 @@
 		<button
 			type="button"
 			class="btn btn-sm variant-filled-primary"
-			on:click={() => editItem(index, item)}
+			on:click={() => editItem(item)}
 		>
 			Save
 		</button>
