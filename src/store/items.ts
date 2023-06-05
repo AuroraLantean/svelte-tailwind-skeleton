@@ -82,15 +82,3 @@ export const toggleFavorite = (id: string) => {
     });
   });
 }
-
-export const setEditing = (id: string, isEditing: boolean) => {
-  const items = get(ItemStore);
-  ItemStore.update(() => {
-    return items.map((item) => {
-      if (item.id === id) {
-        return { ...item, editing: isEditing }
-      }
-      return item;
-    });
-  });
-}

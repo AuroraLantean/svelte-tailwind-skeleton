@@ -7,6 +7,8 @@
 	export let item: ItemForm = {
     id: '',
     quantity: 0,
+    price: 0,
+    currency: 'USD',
 		title: '',
 		category: '',
 		description: '',
@@ -83,7 +85,7 @@
 		{#if item.editing}
       <InputForm {item} isNew={false}/>
 		{:else}
-      <CodeBlock language={item.category} code={item.description} />
+      <CodeBlock language={item.category+' '+item.price+' '+item.currency+' Q='+item.quantity} code={item.description} />
     {/if}
 
 	</section>

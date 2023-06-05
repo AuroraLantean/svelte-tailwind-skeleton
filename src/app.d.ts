@@ -22,6 +22,8 @@ declare class CartItem {
 //-------------------==
 interface ItemFormInput {
   quantity: number,
+  price: number,
+  currency: string,
 	title: string
 	category: string
 	description: string
@@ -29,6 +31,8 @@ interface ItemFormInput {
 interface ItemForm {
   id: string,
   quantity: number,
+  price: number,
+  currency: string,
   title: string
   category: string
   description: string

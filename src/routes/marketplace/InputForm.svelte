@@ -4,6 +4,8 @@
   const itemDefault = {
     id: '',
     quantity: 0,
+    price: 0,
+    currency: 'USD',
 		title: '',
 		category: 'car',
 		description: '',

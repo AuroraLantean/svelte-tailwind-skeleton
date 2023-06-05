@@ -10,7 +10,10 @@
 	const formData = {
 		title: '',
 		category: 'car',
-		description: ''
+		description: '',
+    price: 0,
+    currency: 'USD',
+    quantity: 0,
 	};
 
 	// We've created a custom submit function to pass the response and close the modal.
@@ -58,6 +61,19 @@
           bind:value={formData.description}
         />
       </label>
+      <label class="label">
+				<span>Price</span>
+				<input class="input" type="number" bind:value={formData.price} placeholder="Enter price..." />
+			</label>
+      <label class="label">
+				<span>Currency</span>
+				<input class="input" type="text" bind:value={formData.currency} placeholder="Enter currency..." />
+			</label>
+      <label class="label">
+				<span>Quantity</span>
+				<input class="input" type="number" bind:value={formData.quantity} placeholder="Enter quantity..." />
+			</label>
+
 		</form>
 		<!-- prettier-ignore -->
 		<footer class="modal-footer {parent.regionFooter}">

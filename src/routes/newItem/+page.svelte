@@ -7,6 +7,8 @@
 	const itemDefault = {
     id: '',
     quantity: 0,
+    price: 0,
+    currency: 'USD',
 		title: '',
 		category: 'car',
 		description: '',
@@ -62,6 +64,19 @@
 			bind:value={item.description}
 		/>
 	</label>
+  <label class="label">
+    <span>Price</span>
+    <input class="input" type="number" bind:value={item.price} placeholder="Enter price..." />
+  </label>
+  <label class="label">
+    <span>Currency</span>
+    <input class="input" type="text" bind:value={item.currency} placeholder="Enter currency..." />
+  </label>
+  <label class="label">
+    <span>Quantity</span>
+    <input class="input" type="number" bind:value={item.quantity} placeholder="Enter quantity..." />
+  </label>
+
 	<InputChip bind:value={tags} name="tags" placeholder="Tags..." />
 	<button
 		type="button"
