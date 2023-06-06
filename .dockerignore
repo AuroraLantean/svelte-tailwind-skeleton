@@ -8,6 +8,11 @@ npm-debug.log
 README.md
 Dockerfile*
 docker-compose.yml
+.DS_Store
 build
+package
+dist
+archives
+zz*
 #.svelte-kit
-#.env
+#**/.env
