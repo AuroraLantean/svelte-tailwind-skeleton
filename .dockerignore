@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log
+.git
+.git*
+.eslint*
+.prettier*
+.vscode
+README.md
+Dockerfile*
+docker-compose.yml
+build
+#.svelte-kit
+#.env
