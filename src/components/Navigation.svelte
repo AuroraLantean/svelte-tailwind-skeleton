@@ -14,6 +14,7 @@
 		<li><a href="/ecommerce" on:click={drawerClose}>E-Commerce</a></li>
 		<li><a href="/marketplace" on:click={drawerClose}>Marketplace</a></li>
 		<li><a href="/newItem" on:click={drawerClose}>New Item</a></li>
+		<li><a href="/radix" on:click={drawerClose}>Radix</a></li>
 		<li><a href="/fail" on:click={drawerClose}>Payment failed</a></li>
 		<li><a href="/success" on:click={drawerClose}>Payment Succeeded</a></li>
 	</ul>
