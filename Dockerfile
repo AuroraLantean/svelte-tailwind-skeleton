@@ -1,20 +1,12 @@
 #Use Adapter Node. Make sure you install adapter-node in dependencies, and set adapter to adapter-node in svelte.config.js
-FROM node:18.16.0-alpine AS base
+FROM node:18.16.0-alpine AS builder
 RUN npm install -g pnpm
-
-FROM base AS dependency
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
-
-FROM dependency AS builder
-WORKDIR /app
 COPY . .
 RUN pnpm build
 RUN pnpm prune --prod
-RUN cp -rL node_modules node_modules2
-RUN rm -r node_modules
-RUN mv node_modules2 node_modules
 
 FROM node:18.16.0-alpine AS deployer
 WORKDIR /app
