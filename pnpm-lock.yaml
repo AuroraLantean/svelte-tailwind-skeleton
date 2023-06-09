@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@radixdlt/babylon-gateway-api-sdk':
-    specifier: 1.0.0-ash.2
-    version: 1.0.0-ash.2
+    specifier: 1.0.0-rc.1.8
+    version: 1.0.0-rc.1.8
   '@radixdlt/radix-dapp-toolkit':
     specifier: ^0.2.0
     version: 0.2.0
@@ -437,10 +437,6 @@ packages:
   /@polka/url@1.0.0-next.21:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
     dev: true
-
-  /@radixdlt/babylon-gateway-api-sdk@1.0.0-ash.2:
-    resolution: {integrity: sha512-5WCWJ9dmdeuTYSf4ljQoM22c9fK2bJqunAKP+opxCUw3VtHQ0Zvj0REl3jmwa8/WC0mMkQoR7eWLCv/2AY8lFw==}
-    dev: false
 
   /@radixdlt/babylon-gateway-api-sdk@1.0.0-rc.1.8:
     resolution: {integrity: sha512-E6rqgU7mzwNhw9j453GzO3h1c1ALe97CMaJ4KZX5wvLSASuskBe6NXRkeneJwNR+6bWBgnSY7YEEhs2lRQxFdw==}

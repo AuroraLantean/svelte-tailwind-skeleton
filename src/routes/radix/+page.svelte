@@ -15,12 +15,6 @@
 	} from '../../store/radix';
 
 	//------------------------==
-	const t: ToastSettings = {
-		message: 'Transaction submitted successfully!',
-		background: 'variant-filled-success',
-		timeout: 2000
-	};
-
 	const dAppId = 'account_tdx_c_1pyu3svm9a63wlv6qyjuns98qjsnus0pzan68mjq2hatqejq9fr';
 
 	// Global states
@@ -29,14 +23,18 @@
 	let gumballSymbol = '';
 	let accountName = 'none';
 	let staffBadge = 'none';
-	let withdrawnAmt = '0';
+	let withdrawnAmt = '';
 	let priceOutFromGetPrice = '';
 	let priceOutFromSetPrice = '';
 	let receipt = '';
-	let setPriceInput = 0;
+	let setPriceInput = '1';
 	let gumballBalance = '';
 	let xrdBalance = '';
-
+	const lg = console.log;
+	let res: BcResult;
+	let feePaid = '';
+	let t: ToastSettings;
+	let data: any;
 	//After deploying the package
 	let packageAddressOut = 'package_tdx_c_1qqy67sxv4e2nvls059cutjn5rk8edcvh3a4da7zusgusmkeahk';
 	let packageOwnerBadge = 'resource_tdx_c_1q27nneue67zpuxw6h96j3m86wdhxav8n8q6zymkpfuksxjlcz7';
@@ -48,11 +46,11 @@
 
 	let isAfterLoadEvent = false;
 	let rdt: any;
-	console.log('isAfterLoadEvent: ' + isAfterLoadEvent);
+	lg('isAfterLoadEvent: ' + isAfterLoadEvent);
 	onMount(async () => {
-		console.log('onMount');
+		lg('onMount');
 		isAfterLoadEvent = true;
-		console.log('isAfterLoadEvent: ' + isAfterLoadEvent);
+		lg('isAfterLoadEvent: ' + isAfterLoadEvent);
 
 		rdt = RadixDappToolkit(
 			{ dAppDefinitionAddress: dAppId, dAppName: 'GumballMachine' },
@@ -61,7 +59,7 @@
 					accounts: { quantifier: 'atLeast', quantity: 1 }
 				}).map(({ data: { accounts } }) => {
 					// add accounts to dApp application state
-					console.log('account data: ', accounts);
+					lg('account data: ', accounts);
 					accountName = accounts[0].label;
 					userAccountAddr = accounts[0].address;
 				});
@@ -73,50 +71,144 @@
 				},
 				onInit: ({ accounts }) => {
 					// set your initial application state
-					console.log('onInit accounts: ', accounts);
+					lg('onInit accounts: ', accounts);
 					if (accounts && accounts.length > 0) {
 						accountName = accounts[0].label;
 						userAccountAddr = accounts[0].address;
 					} else {
-						console.log('error... accounts:', accounts);
+						lg('error... accounts:', accounts);
 					}
 				}
 			}
 		);
-		console.log(' Radix dApp Toolkit(rdt): ', rdt);
+		lg(' Radix dApp Toolkit(rdt): ', rdt);
 
 		//gumballBalance = await getTokenBalance(userAccountAddr, tokenAddress);
-		//console.log('gumballBalance:', gumballBalance);
+		//lg('gumballBalance:', gumballBalance);
 	});
+	export const getToastErr = (err: string): ToastSettings => {
+		return {
+			message: 'Transaction failed. Error message: ' + err,
+			background: 'variant-filled-error',
+			timeout: 2000
+		};
+	};
+	export const getToastOk = (): ToastSettings => {
+		return {
+			message: 'Transaction processed successfully!',
+			background: 'variant-filled-success',
+			timeout: 2000
+		};
+	};
 
-  const instantiateCompo = async() => {
-		console.log('instantiateCompo()');
-    compoAddr = await instantiateComponent(packageAddress, userAccountAddr, 1);
-  }
-	const getBalances = async() => {
-		console.log('getBalances()');
-    gumballBalance = await getTokenBalance(userAccountAddr, tokenAddress);
-    xrdBalance = await getXrdBalance(userAccountAddr);
-  }
-	const buyGumballHandler = async() => {
-		console.log('buyGumballHandler()');
-    const out = await buyGumball(rdt, userAccountAddr, compoAddr);
-    receipt = JSON.stringify(out, null, 2);
-    gumballBalance = await getTokenBalance(userAccountAddr, tokenAddress);
-    xrdBalance = await getXrdBalance(userAccountAddr);
-  }
-	const getPriceHandler = async() => {
-		console.log('getPriceHandler()');
-    priceOutFromGetPrice = await getPrice(rdt, compoAddr);
-    console.log("priceOutFromGetPrice:", priceOutFromGetPrice);
-  }
+	const instantiateCompo = async () => {
+		lg('instantiateCompo()');
+		res = await instantiateComponent(packageAddress, userAccountAddr, 1);
+		if (res.error) {
+			t = getToastErr(res.error);
+			toastStore.trigger(t);
+			return true;
+		}
+		t = getToastOk();
+		toastStore.trigger(t);
 
-  const sendTxn = async() => {
-		console.log('sendTxn()');
+		compoAddr = res.data;
+	};
 
+	const getBalances = async () => {
+		lg('getBalances()');
+		gumballBalance = await getTokenBalance(userAccountAddr, tokenAddress);
+		xrdBalance = await getXrdBalance(userAccountAddr);
+	};
+
+	//Write Functions
+	const buyGumballHandler = async () => {
+		lg('buyGumballHandler()');
+		res = await buyGumball(rdt, userAccountAddr, compoAddr);
+		if (res.error) {
+			t = getToastErr(res.error);
+			toastStore.trigger(t);
+			return true;
+		}
+		t = getToastOk();
+		toastStore.trigger(t);
+
+		receipt = JSON.stringify(res.txn, null, 2);
+		gumballBalance = await getTokenBalance(userAccountAddr, tokenAddress);
+		xrdBalance = await getXrdBalance(userAccountAddr);
+	}; //buyGumballHandler
+
+	const getPriceHandler = async () => {
+		lg('getPriceHandler()');
+		res = await getPrice(rdt, compoAddr);
+		if (res.error) {
+			t = getToastErr(res.error);
+			toastStore.trigger(t);
+			return true;
+		}
+		t = getToastOk();
+		toastStore.trigger(t);
+
+		priceOutFromGetPrice = res.data;
+		lg('priceOutFromGetPrice:', priceOutFromGetPrice);
+	}; //GetPrice
+
+	const setPriceHandler = async () => {
+		lg('setPriceHandler()');
+		res = await setPrice(rdt, userAccountAddr, compoAddr, admin_badge, setPriceInput);
+		if (res.error) {
+			t = getToastErr(res.error);
+			toastStore.trigger(t);
+			return true;
+		}
+		t = getToastOk();
+		toastStore.trigger(t);
+
+		priceOutFromSetPrice = res.data;
+		lg('priceOutFromSetPrice:', priceOutFromSetPrice);
+	}; //setPriceHandler
+
+
+	const withdrawEarningsHandler = async () => {
+		lg('withdrawEarningsHandler()');
+		res = await withdrawEarnings(rdt, userAccountAddr, compoAddr, admin_badge);
+		if (res.error) {
+			t = getToastErr(res.error);
+			toastStore.trigger(t);
+			return true;
+		}
+		t = getToastOk();
+		toastStore.trigger(t);
+
+		receipt = res.data;
+		lg('receipt:', receipt);
+	};
+
+	const mintStaffBadgeHandler = async () => {
+		lg('mintStaffBadgeHandler()');
+		res = await mintStaffBadge(rdt, userAccountAddr, compoAddr, admin_badge);
+		if (res.error) {
+			t = getToastErr(res.error);
+			toastStore.trigger(t);
+			return true;
+		}
+		t = getToastOk();
+		toastStore.trigger(t);
+
+		receipt = res.data;
+		lg('receipt:', receipt);
+	};
+
+	const sendTxn = async () => {
+		lg('sendTxn()');
+		t = {
+			message: 'Transaction submitted successfully!',
+			background: 'variant-filled-success',
+			timeout: 2000
+		};
 		toastStore.trigger(t);
 		goto('/marketplace');
-	}
+	};
 </script>
 
 <div class="card p-4 w-full text-token space-y-4">
@@ -153,10 +245,8 @@
 			>Buy 1 GUM</button
 		>
 
-		<button
-			type="button"
-			class="btn btn-sm variant-filled-secondary"
-			on:click={() => getBalances()}>Get Balances</button
+		<button type="button" class="btn btn-sm variant-filled-secondary" on:click={() => getBalances()}
+			>Get Balances</button
 		>
 		Balance: {gumballBalance} Tokens, {xrdBalance} XRD
 	</p>
@@ -177,21 +267,21 @@
 
 	<p>
 		<input type="text" placeholder="New Price" bind:value={setPriceInput} />
-		<button type="button" class="btn btn-sm variant-filled-error" on:click={setPrice}
+		<button type="button" class="btn btn-sm variant-filled-error" on:click={setPriceHandler}
 			>Set Price</button
 		>
 		Price: {priceOutFromSetPrice}
 	</p>
 
 	<p>
-		<button type="button" class="btn btn-sm variant-filled-error" on:click={withdrawEarnings}
+		<button type="button" class="btn btn-sm variant-filled-error" on:click={withdrawEarningsHandler}
 			>Withdraw Earnings</button
 		>
 		Withdrawn Amount: {withdrawnAmt}
 	</p>
 
 	<p>
-		<button type="button" class="btn btn-sm variant-filled-error" on:click={mintStaffBadge}
+		<button type="button" class="btn btn-sm variant-filled-error" on:click={mintStaffBadgeHandler}
 			>Mint Staff Badge</button
 		>
 		Badge Minted: {staffBadge}

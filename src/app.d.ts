@@ -8,6 +8,11 @@ declare namespace App {
   // interface Platform {}
 }
 
+declare class BcResult {
+  error: string
+  data: any
+  txn: any
+}
 declare class Product {
   id: string    // Stripe ID
   name: string  // "Coffee"

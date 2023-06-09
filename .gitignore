@@ -13,6 +13,7 @@ dist
 archives
 css
 zz*
+*.rs
 fly.toml
 .vercel
 .output

@@ -24,30 +24,33 @@ const stateApi = new StateApi();
 //const streamApi = new StreamApi();
 
 const xrdAddress = 'resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv';
+const lg = console.log;
 
 export const getTokenBalance = async (userAccountAddr: string, tokenAddress: string): Promise<string> => {
-  console.log('getTokenBalance()...userAccountAddr:', userAccountAddr, ', tokenAddress:', tokenAddress);
+  lg('getTokenBalance()...userAccountAddr:', userAccountAddr, ', tokenAddress:', tokenAddress);
   const response = await stateApi.entityFungibleResourceVaultPage({
     stateEntityFungibleResourceVaultsPageRequest: {
       address: userAccountAddr,
       resource_address: tokenAddress
     }
   });
-  console.log('response:', response);
+  lg('response:', response);
   if (response && response.items[0]) {
     return response.items[0].amount;
   }
   return 'undefined';
 };
+
 export const getXrdBalance = async (userAccountAddr: string): Promise<string> => {
-  console.log('getTokenBalance()...userAccountAddr:', userAccountAddr, ', xrdAddress:', xrdAddress);
+  lg('getTokenBalance()...userAccountAddr:', userAccountAddr, ', xrdAddress:', xrdAddress);
+
   const response = await stateApi.entityFungibleResourceVaultPage({
     stateEntityFungibleResourceVaultsPageRequest: {
       address: userAccountAddr,
       resource_address: xrdAddress
     }
   });
-  console.log('response:', response);
+  lg('response:', response);
   if (response && response.items[0]) {
     return response.items[0].amount;
   }
@@ -55,7 +58,7 @@ export const getXrdBalance = async (userAccountAddr: string): Promise<string> =>
 };
 
 // ************ Instantiate component and fetch component and resource addresses *************
-export const instantiateComponent = async (packageAddress: string, userAccountAddr: string, initPrice: number):string => {
+export const instantiateComponent = async (packageAddress: string, userAccountAddr: string, initPrice: number):BcResult => {
   const manifest = new ManifestBuilder()
     .callFunction(packageAddress, 'GumballMachine', 'instantiate_gumball_machine', [
       Decimal(initPrice),
@@ -64,42 +67,46 @@ export const instantiateComponent = async (packageAddress: string, userAccountAd
     .callMethod(userAccountAddr, 'deposit_batch', [Expression('ENTIRE_WORKTOP')])
     .build()
     .toString();
-  console.log('Instantiate Manifest: ', manifest);
+  lg('Instantiate Manifest: ', manifest);
   // Send manifest to extension for signing
   const result = await rdt.sendTransaction({
     transactionManifest: manifest,
     version: 1
   });
+  if (result.isErr()) return {
+    error: result.error, data: "", txn: ""
+  }
 
-  if (result.isErr()) throw result.error;
-
-  console.log('Intantiate WalletSDK Result: ', result.value);
-
+  lg('Intantiate Result: ', result.value);
+  const intentHashHex = result.value.transactionIntentHash;
+  lg('intentHashHex:', intentHashHex);
   // ************ Fetch the transaction status from the Gateway API ************
   const status = await transactionApi.transactionStatus({
     transactionStatusRequest: {
-      intent_hash_hex: result.value.transactionIntentHash
+      intent_hash_hex: intentHashHex
     }
   });
-  console.log('Instantiate TransactionApi transaction/status:', status);
+  lg('Instantiate TransactionApi transaction/status:', status);
 
   // ************ Fetch component address from gateway api and set compoAddr variable **************
   const commitReceipt = await transactionApi.transactionCommittedDetails({
     transactionCommittedDetailsRequest: {
-      intent_hash_hex: result.value.transactionIntentHash
+      intent_hash_hex: intentHashHex
     }
   });
-  console.log('Instantiate Committed Details Receipt', commitReceipt);
+  lg('Instantiate Committed Details Receipt', commitReceipt);
 
   // ****** Set compoAddr variable with gateway api commitReciept payload ******
-  compoAddr = commitReceipt.transaction.referenced_global_entities[0];
+  const compoAddr = commitReceipt.transaction.referenced_global_entities[0];
   // ****** Set tokenAddress variable with gateway api commitReciept payload ******
   //admin_badge = commitReceipt.details.referenced_global_entities[1];
-  return compoAddr;
+  const out = compoAddr;
+  lg('compoAddr:', out, typeof out);// JSON.stringify();
+  return { error: '', data: out }
 };
 
-// *********** Buy Gumball ***********
-export const buyGumball = async (rdt: any, userAccountAddr:string, compoAddr: string):string => {
+// *********** buyGumball ***********
+export const buyGumball = async (rdt, userAccountAddr:string, compoAddr: string):BcResult => {
   const manifest = new ManifestBuilder()
     .callMethod(userAccountAddr, 'withdraw', [Address(xrdAddress), Decimal(33)])
     .takeFromWorktop(xrdAddress, 'xrd_bucket')
@@ -108,196 +115,212 @@ export const buyGumball = async (rdt: any, userAccountAddr:string, compoAddr: st
     .build()
     .toString();
 
-  console.log('buy_gumball manifest: ', manifest);
+  lg('buyGumball manifest: ', manifest);
 
   // Send manifest to extension for signing
   const result = await rdt.sendTransaction({
     transactionManifest: manifest,
     version: 1
   });
+  if (result.isErr()) return {
+    error: result.error, data: "", txn: ""
+  }
 
-  if (result.isErr()) throw result.error;
-
-  console.log('Buy Gumball sendTransaction Result: ', result);
+  lg('buyGumball sendTransaction Result: ', result);
+  const intentHashHex = result.value.transactionIntentHash;
+  lg('intentHashHex:', intentHashHex);
 
   // Fetch the transaction status from the Gateway SDK
   const status = await transactionApi.transactionStatus({
     transactionStatusRequest: {
-      intent_hash_hex: result.value.transactionIntentHash
+      intent_hash_hex: intentHashHex
     }
   });
-  console.log('Buy Gumball TransactionAPI transaction/status: ', status);
+  lg('buyGumball TransactionAPI transaction status: ', status);
 
   // fetch commit reciept from gateway api
   const commitReceipt = await transactionApi.transactionCommittedDetails({
     transactionCommittedDetailsRequest: {
-      intent_hash_hex: result.value.transactionIntentHash
+      intent_hash_hex: intentHashHex
     }
   });
-  console.log('Buy Gumball Committed Details Receipt', commitReceipt);
-
-  //const ledger_state = JSON.stringify(commitReceipt.ledger_state, null, 2);
-  //const transaction = JSON.stringify(commitReceipt.transaction, null, 2);
-  //console.log('ledger_state: ' + ledger_state, ', transaction: ' + transaction);
-  // Show the receipt on the DOM
-  return commitReceipt.transaction;
-};
+  lg('buyGumball Committed Details Receipt', commitReceipt);
+  const txnOut = commitReceipt.transaction;
+  lg('txnOut', txnOut);// JSON.stringify();
+  return { error: '', data: '', txn: txnOut };
+};//buyGumball
 
 // *********** Get Price ***********
-export const getPrice = async (rdt: any, compoAddr: string):string => {
+export const getPrice = async (rdt, compoAddr: string):BcResult => {
   const manifest = new ManifestBuilder()
     .callMethod(compoAddr, 'get_price', [])
     .build()
     .toString();
-  console.log('get_price manifest', manifest);
+  lg('get_price manifest', manifest);
 
   // Send manifest to extension for signing
   const result = await rdt.sendTransaction({
     transactionManifest: manifest,
     version: 1
   });
+  if (result.isErr()) return {
+    error: result.error, data: "", txn: ""
+  }
 
-  if (result.isErr()) throw result.error;
-
-  console.log('get_price sendTransaction Result: ', result);
-
+  lg('get_price sendTransaction Result: ', result);
+  const intentHashHex = result.value.transactionIntentHash;
+  lg('intentHashHex:', intentHashHex);
   // Fetch the transaction status from the Gateway SDK
   const status = await transactionApi.transactionStatus({
     transactionStatusRequest: {
-      intent_hash_hex: result.value.transactionIntentHash
+      intent_hash_hex: intentHashHex
     }
   });
-  console.log('get_price status', status);
+  lg('get_price status', status);
 
   // fetch commit reciept from gateway api
   const commitReceipt = await transactionApi.transactionCommittedDetails({
     transactionCommittedDetailsRequest: {
-      intent_hash_hex: result.value.transactionIntentHash
+      intent_hash_hex: intentHashHex
     }
   });
-  console.log('get_price commitReceipt', commitReceipt);
+  lg('get_price commitReceipt', commitReceipt);
+   //https://radix-rcnet-v1-gateway.redoc.ly/#operation/TransactionSubmit
+  const txnOut = commitReceipt.transaction;
+  const out = commitReceipt.details.receipt.output[1].data_json.value;// JSON.stringify(out);
+  lg('Price:', out, typeof out);
+  return { error: '', data: out, txn: txnOut };
+};//GetPrice
 
-  // Show the receipt on the DOM
-  priceOutFromGetPrice = JSON.stringify(commitReceipt.details.receipt.output[1].data_json.value);
-  return priceOutFromGetPrice;
-};
 // *********** Set Price ***********
-export const setPrice = async () => {
+export const setPrice = async (rdt, userAccountAddr: string, compoAddr: string, admin_badge: string, setPriceInput: string):BcResult => {
   const manifest = new ManifestBuilder()
     .callMethod(userAccountAddr, 'create_proof', [Address(admin_badge)])
     .callMethod(compoAddr, 'set_price', [Decimal(setPriceInput)])
     .build()
     .toString();
-  console.log('set_price manifest', manifest);
+  lg('set_price manifest', manifest);
 
   // Send manifest to extension for signing
   const result = await rdt.sendTransaction({
     transactionManifest: manifest,
     version: 1
   });
+  if (result.isErr()) return {
+    error: result.error, data: "", txn: ""
+  }
 
-  if (result.isErr()) throw result.error;
-
-  console.log('set_price sendTransaction Result: ', result);
-
+  lg('set_price sendTransaction Result: ', result);
+  const intentHashHex = result.value.transactionIntentHash;
+  lg('intentHashHex:', intentHashHex);
   // Fetch the transaction status from the Gateway SDK
   const status = await transactionApi.transactionStatus({
     transactionStatusRequest: {
-      intent_hash_hex: result.value.transactionIntentHash
+      intent_hash_hex: intentHashHex
     }
   });
-  console.log('set_price status', status);
+  lg('set_price status', status);
 
   // fetch commit reciept from gateway api
   const commitReceipt = await transactionApi.transactionCommittedDetails({
     transactionCommittedDetailsRequest: {
-      intent_hash_hex: result.value.transactionIntentHash
+      intent_hash_hex: intentHashHex
     }
   });
-  console.log('set_price commitReceipt', commitReceipt);
+  lg('set_price commitReceipt', commitReceipt);
+  
+  const txnOut = commitReceipt.transaction;
+  const out = commitReceipt.details.receipt.state_updates.updated_substates[0].substate_data.data_struct
+  .struct_data.data_json.fields[2].value;
+  lg('newPrice:', out, typeof out);// JSON.stringify();
+  return { error: '', data: out, txn: txnOut };
+};//setPrice
 
-  // Show the receipt on the DOM .data_struct.struct_data.data_json.fields[2].value
-  /*priceOutFromSetPrice = JSON.stringify(
-    commitReceipt.details.receipt.state_updates.updated_substates[0].substate_data.data_struct
-      .struct_data.data_json.fields[2].value
-  );*/
-};
 // *********** Withdraw Earnings ***********
-export const withdrawEarnings = async () => {
+export const withdrawEarnings = async (rdt, userAccountAddr: string, compoAddr: string, admin_badge: string):BcResult => {
   const manifest = new ManifestBuilder()
     .callMethod(userAccountAddr, 'create_proof', [Address(admin_badge)])
     .callMethod(compoAddr, 'withdraw_earnings', [])
     .callMethod(userAccountAddr, 'deposit_batch', [Expression('ENTIRE_WORKTOP')])
     .build()
     .toString();
-  console.log('Withdraw Earnings manifest', manifest);
+  lg('Withdraw Earnings manifest', manifest);
 
   // Send manifest to extension for signing
   const result = await rdt.sendTransaction({
     transactionManifest: manifest,
     version: 1
   });
+  if (result.isErr()) return {
+    error: result.error, data: "", txn: ""
+  }
 
-  if (result.isErr()) throw result.error;
-
-  console.log('Withdraw Earnings sendTransaction Result: ', result);
-
+  lg('Withdraw Earnings sendTransaction Result: ', result);
+  const intentHashHex = result.value.transactionIntentHash;
+  lg('intentHashHex:', intentHashHex);
   // Fetch the transaction status from the Gateway SDK
   const status = await transactionApi.transactionStatus({
     transactionStatusRequest: {
-      intent_hash_hex: result.value.transactionIntentHash
+      intent_hash_hex: intentHashHex
     }
   });
-  console.log('Withdraw Earnings status', status);
+  lg('Withdraw Earnings status', status);
 
   // fetch commit reciept from gateway api
   const commitReceipt = await transactionApi.transactionCommittedDetails({
     transactionCommittedDetailsRequest: {
-      intent_hash_hex: result.value.transactionIntentHash
+      intent_hash_hex: intentHashHex
     }
   });
-  console.log('Withdraw Earnings commitReceipt', commitReceipt);
+  lg('Withdraw Earnings commitReceipt', commitReceipt);
+  
+  const txnOut = commitReceipt.transaction;
+  const out = commitReceipt.details.receipt;
+  lg('receipt:', out, typeof out);// JSON.stringify();
+  return { error: '', data: out, txn: txnOut };
 
-  // Show the receipt on the DOM
-  //withdrawnAmt = JSON.stringify(commitReceipt.details.receipt);
-};
+};//withdrawEarnings
 
 // *********** Mint NFT Staff Badge ***********
-export const mintStaffBadge = async () => {
+export const mintStaffBadge = async (rdt, userAccountAddr: string, compoAddr: string, admin_badge: string):BcResult => {
   const manifest = new ManifestBuilder()
     .callMethod(userAccountAddr, 'create_proof', [Address(admin_badge)])
     .callMethod(compoAddr, 'mint_staff_badge', [`"${'Number 2'}"`])
     .callMethod(userAccountAddr, 'deposit_batch', [Expression('ENTIRE_WORKTOP')])
     .build()
     .toString();
-  console.log('mintStaffBadge manifest', manifest);
+  lg('mintStaffBadge manifest', manifest);
 
   // Send manifest to extension for signing
   const result = await rdt.sendTransaction({
     transactionManifest: manifest,
     version: 1
   });
+  if (result.isErr()) return {
+    error: result.error, data: "", txn: ""
+  }
 
-  if (result.isErr()) throw result.error;
-
-  console.log('mintStaffBadge sendTransaction Result: ', result);
-
+  lg('mintStaffBadge sendTransaction Result: ', result);
+  const intentHashHex = result.value.transactionIntentHash;
+  lg('intentHashHex:', intentHashHex);
   // Fetch the transaction status from the Gateway SDK
   const status = await transactionApi.transactionStatus({
     transactionStatusRequest: {
-      intent_hash_hex: result.value.transactionIntentHash
+      intent_hash_hex: intentHashHex
     }
   });
-  console.log('mintStaffBadge status', status);
+  lg('mintStaffBadge status', status);
 
   // fetch commit reciept from gateway api
   const commitReceipt = await transactionApi.transactionCommittedDetails({
     transactionCommittedDetailsRequest: {
-      intent_hash_hex: result.value.transactionIntentHash
+      intent_hash_hex: intentHashHex
     }
   });
-  console.log('mintStaffBadge commitReceipt', commitReceipt);
-
-  // Show the receipt on the DOM
-  //staffBadge = JSON.stringify(commitReceipt.details.receipt);
-};
+  lg('mintStaffBadge commitReceipt', commitReceipt);
+  
+  const txnOut = commitReceipt.transaction;
+  const out = commitReceipt.details.receipt;
+  lg('staffBadge:', out, typeof out);// JSON.stringify();
+  return { error: '', data: out, txn: txnOut };
+};//mintStaffBadge
