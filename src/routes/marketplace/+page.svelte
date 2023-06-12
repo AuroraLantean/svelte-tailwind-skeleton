@@ -8,13 +8,14 @@
 	} from '@skeletonlabs/skeleton';
 	import ItemCard from './ItemCard.svelte';
 	import { ItemStore, addItem } from '../../store/items';
-	import type { PageData } from './$types';
+	//import type { PageData } from './$types';
 	import ModalAddItem from '../../components/ModalAddItem.svelte';
 
-	export let data: PageData;
-
+	export let data;//: PageData;
+  //$: ( { items } = data ); 
+  const { items } = data;
 	//console.log("data.items:", data.items)
-	ItemStore.set(data.items);
+	ItemStore.set(items);
 	// ItemStore -> a local writable that allows us to store  items
 	// create / delete items
 	// favorite items

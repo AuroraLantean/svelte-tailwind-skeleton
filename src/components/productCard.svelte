@@ -3,8 +3,8 @@
 	import { cartItems, addToCart, removeFromCart } from '../store/cart';
 
 	export let product: Product = { id: '', name: '', price: 0 };
-	//let cart = get(cartItems); // [ { id: "1", quantity: 6 }, { id: "2", quantity: 3 } ]
-	let cart = get(cartItems); // [ { id: "1", quantity: 6 }, { id: "2", quantity: 3 } ]
+	//let cart = get(cartItems); // [ { id: "1", stock: 6 }, { id: "2", stock: 3 } ]
+	let cart = get(cartItems); // [ { id: "1", stock: 6 }, { id: "2", stock: 3 } ]
 	let cartItemIndex = cart.findIndex((item) => {
 		return item.id === product.id;
 	});
@@ -25,7 +25,7 @@
 
 	{#if cartProduct !== undefined}
 		<div class="card-body px-4">
-			Quantity: <strong>{cartProduct.quantity}</strong>
+			Stock: <strong>{cartProduct.stock}</strong>
 		</div>
 	{/if}
 

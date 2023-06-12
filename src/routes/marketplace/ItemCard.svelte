@@ -6,7 +6,7 @@
 
 	export let item: ItemForm = {
     id: '',
-    quantity: 0,
+    stock: 0,
     price: 0,
     currency: 'USD',
 		title: '',
@@ -46,7 +46,9 @@
 		{#if item.editing}
       To Be Edited Below...
 		{:else}
-			{item.title}
+      <h2>
+        <a href="/marketplace/{item.id}" data-sveltekit-preload-data>{item.title}</a>
+      </h2>
     {/if}
       <div class="float-right">
 				<button
@@ -81,11 +83,11 @@
 
 	</header>
 	
-  <section class="p-4">
+  <section class="p-4 mt-5">
 		{#if item.editing}
       <InputForm {item} isNew={false}/>
 		{:else}
-      <CodeBlock language={item.category+' '+item.price+' '+item.currency+' Q='+item.quantity} code={item.description} />
+      <CodeBlock language={item.category+' '+item.price+' '+item.currency+' Q='+item.stock} code={item.description} />
     {/if}
 
 	</section>

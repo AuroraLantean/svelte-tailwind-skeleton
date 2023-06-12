@@ -6,7 +6,7 @@
 	let tags: string[] = [];
 	const itemDefault = {
     id: '',
-    quantity: 0,
+    stock: 0,
     price: 0,
     currency: 'USD',
 		title: '',
@@ -73,8 +73,8 @@
     <input class="input" type="text" bind:value={item.currency} placeholder="Enter currency..." />
   </label>
   <label class="label">
-    <span>Quantity</span>
-    <input class="input" type="number" bind:value={item.quantity} placeholder="Enter quantity..." />
+    <span>Stock</span>
+    <input class="input" type="number" bind:value={item.stock} placeholder="Enter stock..." />
   </label>
 
 	<InputChip bind:value={tags} name="tags" placeholder="Tags..." />

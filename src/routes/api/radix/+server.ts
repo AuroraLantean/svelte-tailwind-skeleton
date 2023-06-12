@@ -9,7 +9,7 @@ const SECRET_KEY = "";
 
 export const POST: RequestHandler = async ({request}) => {
     console.log("server api@/api/radix")
-    // items: [ { id: "1", quantity: 6 }, { id: "2", quantity: 3 } ]
+    // items: [ { id: "1", stock: 6 }, { id: "2", stock: 3 } ]
     const data = await request.json();
     const items = data.items;
     console.log(items);

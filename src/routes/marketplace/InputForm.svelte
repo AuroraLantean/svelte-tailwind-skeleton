@@ -3,7 +3,7 @@
 
   const itemDefault = {
     id: '',
-    quantity: 0,
+    stock: 0,
     price: 0,
     currency: 'USD',
 		title: '',
@@ -34,6 +34,9 @@
 	<label class="label">
 		<span>Category</span>
 		<select class="select" bind:value={item.category}>
+			<option value="smartphones">Smartphone</option>
+			<option value="laptops">Laptop</option>
+			<option value="desktop">Desktop</option>
 			<option value="car">Car</option>
 			<option value="yacht">Yacht</option>
 			<option value="airplane">Airplane</option>

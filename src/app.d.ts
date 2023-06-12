@@ -8,6 +8,13 @@ declare namespace App {
   // interface Platform {}
 }
 
+declare class Contact {
+  id: string
+  name: string
+  email: string
+  company: string
+  job: string
+}
 declare class BcResult {
   error: string
   data: any
@@ -21,12 +28,12 @@ declare class Product {
 
 declare class CartItem {
   id: string
-  quantity: number
+  stock: number
 }
 
 //-------------------==
 interface ItemFormInput {
-  quantity: number,
+  stock: number,
   price: number,
   currency: string,
 	title: string
@@ -35,7 +42,7 @@ interface ItemFormInput {
 }
 interface ItemForm {
   id: string,
-  quantity: number,
+  stock: number,
   price: number,
   currency: string,
   title: string

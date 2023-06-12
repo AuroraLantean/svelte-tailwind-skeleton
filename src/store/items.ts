@@ -23,9 +23,9 @@ export const buyItem = (id: string) => {
   console.log("buyItem. id:", id)
 
   const newItems = items.map((item) => {
-    if(item.quantity === 0) return item;
+    if(item.stock === 0) return item;
     if (item.id === id) {
-      return { ...item, quantity: item.quantity -1 }
+      return { ...item, stock: item.stock -1 }
     }
     return item;
   });

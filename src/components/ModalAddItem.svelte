@@ -13,7 +13,7 @@
 		description: '',
     price: 0,
     currency: 'USD',
-    quantity: 0,
+    stock: 0,
 	};
 
 	// We've created a custom submit function to pass the response and close the modal.
@@ -70,8 +70,8 @@
 				<input class="input" type="text" bind:value={formData.currency} placeholder="Enter currency..." />
 			</label>
       <label class="label">
-				<span>Quantity</span>
-				<input class="input" type="number" bind:value={formData.quantity} placeholder="Enter quantity..." />
+				<span>Stock</span>
+				<input class="input" type="number" bind:value={formData.stock} placeholder="Enter stock..." />
 			</label>
 
 		</form>
