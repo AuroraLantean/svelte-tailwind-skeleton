@@ -4,7 +4,7 @@
 	import { buyItem, deleteItem, editItem, toggleFavorite } from '../../store/items';
 	import InputForm from './InputForm.svelte';
 
-	export let item: ItemForm = {
+	export let item: Item = {
     id: '',
     stock: 0,
     price: 0,

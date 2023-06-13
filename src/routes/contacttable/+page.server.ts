@@ -1,4 +1,4 @@
-import { invalid, redirect } from "@sveltejs/kit"
+import { redirect } from "@sveltejs/kit"
 
 let contacts: Contact[] = [
   {

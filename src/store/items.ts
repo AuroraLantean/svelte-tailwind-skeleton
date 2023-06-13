@@ -3,14 +3,14 @@ import { writable, get } from "svelte/store";
 // ItemStore
 // Item
 // Title, Item, Language, Favorite
-export const ItemStore = writable<ItemForm[]>([]); // [itemForm1,itemForm2,etc.]
+export const ItemStore = writable<Item[]>([]); // [itemForm1,itemForm2,etc.]
 
 // addItem
-export const addItem = (input: ItemFormInput) => {
+export const addItem = (input: ItemForm) => {
   const items = get(ItemStore);
   const uuid = crypto.randomUUID();//only on localhost or https
   console.log("uuid: " + uuid);
-  ItemStore.update(() => { // ItemForm[]
+  ItemStore.update(() => { // Item[]
     return [{
       ...input, id: uuid, favorite: false,
       editing: false, checked: false
@@ -37,7 +37,7 @@ export const buyItem = (id: string) => {
 
 
 // editItem
-export const editItem = (input: ItemForm) => {
+export const editItem = (input: Item) => {
   //console.log("editItem(), input: ", input)
   const items = get(ItemStore);
 
@@ -56,7 +56,7 @@ export const editItem = (input: ItemForm) => {
 // deleteItem
 export const deleteItem = (id: string) => {
   const items = get(ItemStore);
-  const newItems = items.reduce((result: ItemForm[], item) => {
+  const newItems = items.reduce((result: Item[], item) => {
     if (item.id !== id) {
       result.push(item);
     }

@@ -30,9 +30,18 @@ declare class CartItem {
   id: string
   stock: number
 }
-
-//-------------------==
-interface ItemFormInput {
+//-------------------== User
+interface User {
+  id: string,
+	name: string,
+  email: string,
+  description: string,
+  region: string,
+  level: number,
+  verified: number,
+}
+//-------------------== Item
+interface ItemForm {
   stock: number,
   price: number,
   currency: string,
@@ -40,7 +49,7 @@ interface ItemFormInput {
 	category: string
 	description: string
 }
-interface ItemForm {
+interface Item {
   id: string,
   stock: number,
   price: number,

@@ -13,7 +13,7 @@
 		editing: false,
 		checked: false
 	};
-	export let item: ItemForm = itemDefault;
+	export let item: Item = itemDefault;
 	export let isNew: boolean = true;
   const resetItem = () => { 
     item.title = "";

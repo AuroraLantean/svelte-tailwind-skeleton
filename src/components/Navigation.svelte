@@ -19,5 +19,7 @@
 		<li><a href="/radix" on:click={drawerClose}>Radix</a></li>
 		<li><a href="/fail" on:click={drawerClose}>Payment failed</a></li>
 		<li><a href="/success" on:click={drawerClose}>Payment Succeeded</a></li>
+		<li><a href="/auth/login" on:click={drawerClose}>Login</a></li>
+		<li><a href="/auth/register" on:click={drawerClose}>Register</a></li>
 	</ul>
 </nav>

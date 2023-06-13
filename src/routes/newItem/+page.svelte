@@ -16,7 +16,7 @@
 		editing: false,
 		checked: false
 	};
-	export let item: ItemForm = itemDefault;
+	export let item: Item = itemDefault;
 
 	const resetItem = () => {
 		item.title = '';
