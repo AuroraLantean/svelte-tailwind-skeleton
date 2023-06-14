@@ -82,7 +82,15 @@
 			bind:value={user.passwordConfirmation}
 		/>
 	</label>
-	<label class="label">
+  <label class="label">
+    <span>Name</span>
+    <input class="input" type="text" placeholder="Enter name here..." bind:value={user.name} />
+  </label>
+  <label class="label">
+    <span>Avatar</span>
+    <input class="input" type="text" placeholder="Enter avatar here..." bind:value={user.avatar} />
+  </label>
+  <label class="label">
 		<span>Region</span>
 		<select class="select" bind:value={user.region}>
 			<option value="Antarctica">Antarctica</option>
