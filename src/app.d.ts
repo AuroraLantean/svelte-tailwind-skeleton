@@ -31,10 +31,24 @@ declare class CartItem {
   stock: number
 }
 //-------------------== User
+interface DbInfo {
+  url: string,
+  uid: string,
+	jwt: string,
+}
+interface UserInfo {
+  id: string,
+	token: string,
+  isValid: boolean,
+}
 interface User {
   id: string,
-	name: string,
+	username: string,
   email: string,
+  password: string,
+  passwordConfirmation: string,
+  name: string,
+  avatar: string,
   description: string,
   region: string,
   level: number,
