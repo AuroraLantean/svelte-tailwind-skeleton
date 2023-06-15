@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { getDbInfo, getUser, logoutUser } from '@store/users';
+	import { deleteUser, getDbInfo, getUser, logoutUser, updateUser } from '@store/users';
 	import { onMount } from 'svelte';
 
 	export let isToView = true;
@@ -29,18 +29,23 @@
 		console.log('after onMount(). user:', user);
 	});
 
-	const handleUpdate = async (user: User) => {
-		console.log('handleUpdate... user:', user);
+	const handleUpdateProfile = async (user: User) => {
+		console.log('handleUpdateProfile... user:', user);
 		isToView = false;
 	};
-	const handleSave = async (user: User) => {
-		console.log('handleSave... user:', user);
+	const handleUpdate = async (user: User) => {
+		console.log('handleUpdate... user:', user);
 		isToView = true;
+    await updateUser(user);
 	};
 	const handleLogout = async () => {
 		console.log('handleLogout');
 		await logoutUser();
 		goto('/auth/login');
+	};
+  const handlerDeleteUser = async (user: User) => {
+		console.log('handlerDeleteUser... user:', user);
+    await deleteUser(user) 
 	};
 </script>
 
@@ -152,15 +157,18 @@
 
 	<div class="container h-full mx-auto flex flex-row justify-between">
 		{#if isToView}
-			<button type="button" class="btn variant-filled-primary" on:click={() => handleUpdate(user)}>
-				Update
+			<button type="button" class="btn variant-filled-primary" on:click={() => handleUpdateProfile(user)}>
+				Update Profile
 			</button>
 		{:else}
-			<button type="button" class="btn variant-filled-primary" on:click={() => handleSave(user)}>
+			<button type="button" class="btn variant-filled-primary" on:click={() => handleUpdate(user)}>
 				Save
 			</button>
 		{/if}
 
+		<button type="button" class="btn variant-ghost-error" on:click={() => handlerDeleteUser(user)}>
+			Delete User
+		</button>
 		<button type="button" class="btn variant-ghost-error" on:click={() => handleLogout()}>
 			Logout
 		</button>

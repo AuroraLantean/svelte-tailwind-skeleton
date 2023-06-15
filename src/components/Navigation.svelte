@@ -17,8 +17,8 @@
 		<li><a href="/newItem" on:click={drawerClose}>New Item</a></li>
 		<li><a href="/marketplace/1" on:click={drawerClose}>ProductId = 1</a></li>
 		<li><a href="/radix" on:click={drawerClose}>Radix</a></li>
-		<li><a href="/success" on:click={drawerClose}>Payment Succeeded</a></li>
 		<li><a href="/auth/login" on:click={drawerClose}>Login/Register</a></li>
 		<li><a href="/auth/profile" on:click={drawerClose}>User Profile</a></li>
+		<li><a href="/userMgmt" on:click={drawerClose}>User Management</a></li>
   </ul>
 </nav>
