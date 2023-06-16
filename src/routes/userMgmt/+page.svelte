@@ -1,31 +1,34 @@
 <script lang="ts">
-	//import UserTable from '@components/UserTable.svelte';
 	import { Table } from '@skeletonlabs/skeleton';
 	import type { TableSource } from '@skeletonlabs/skeleton';
 	import { tableMapperValues } from '@skeletonlabs/skeleton';
-	import { addUser, deleteUser, updateUser } from '@store/users.js';
+	import { addUser, deleteUser, getUsers, updateUser } from '@store/users.js';
+	import { onMount } from 'svelte';
 
 	export let pagetype = 'User Management';
-	export let data;
+  let users: User[] = [];//export let data;
   let tableSimple: TableSource;
+  onMount(async()=>{
+    users = await getUsers();
+  })
 	$: {
     tableSimple = {
 		// A list of heading labels.
 		head: ['id', 'username', 'email', 'name', 'avatar'],
 		// The data visibly shown in your table body UI.
-		body: tableMapperValues(data.users, ['id', 'username', 'email', 'name', 'avatar']),
+		body: tableMapperValues(users, ['id', 'username', 'email', 'name', 'avatar']),
 		// Optional: The data returned when interactive is enabled and a row is clicked.
-		meta: tableMapperValues(data.users, ['id', 'username', 'email', 'name', 'avatar']),
+		meta: tableMapperValues(users, ['id', 'username', 'email', 'name', 'avatar']),
 		// Optional: A list of footer labels.
 		foot: ['Total', '', '<code class="code">5</code>']
 	};
 }
 	const userDefault = {
 		id: '',
-		username: 'abu',
+		username: 'abudabi',
 		email: 'abu@gmail.com',
-		password: 'abu123',
-		passwordConfirmation: 'abu123',
+		password: 'abudabi1234',
+		passwordConfirmation: 'abudabi1234',
 		name: 'abudabi',
 		avatar: '',
 		description: '',
@@ -49,17 +52,17 @@
 	const handlerAddUser = async (user: User) => {
 		console.log('handlerAddUser... user:', user);
 		await addUser(user);
-    //data.users = [...data.users, user];
-		//data.users.push(user);
-		//console.log('data:', data);
+    users = await getUsers();
 	};
 	const handlerUpdateUser = async (user: User) => {
 		console.log('handlerUpdateUser... user:', user);
-    await updateUser(user) 
+    await updateUser(user);
+    users = await getUsers();
 	};
 	const handlerDeleteUser = async (user: User) => {
 		console.log('handlerDeleteUser... user:', user);
-    await deleteUser(user) 
+    await deleteUser(user);
+    users = await getUsers();
 	};
 	const mySelectionHandler = (row: any) => {
 		console.log('mySelectionHandler..., row:', row);

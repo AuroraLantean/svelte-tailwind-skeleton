@@ -42,9 +42,9 @@ const users: User[] = [
   }
 ]
 
-export const load = async() => {
-  const users = await getUsers();
-  return {
-    users
-  };
-}
+// export const load = async() => {
+//   const users = await getUsers();
+//   return {
+//     users
+//   };
+// }

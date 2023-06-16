@@ -33,8 +33,8 @@ export const addUser = async (user: User) => {
     "username": user.username,
     "email": user.email,
     "emailVisibility": true,
-    "password": user.password,
-    "passwordConfirm": user.passwordConfirmation,
+    "password": 'johndoe123',
+    "passwordConfirm": 'johndoe123',
     "name": user.name
   };
   console.log('data:', data);
@@ -195,19 +195,28 @@ export const getUser = async (id: string): User => {
 
 // updateUser
 export const updateUser = async (user: User) => {
-  console.log('updateUser()...');
-  console.log('pocketbaseURL:', pocketbaseURL);
-  const pb = new PocketBase(pocketbaseURL);
-
+  console.log('updateUser()... user:', user);
+  console.log('user.username:', user.username)
+  console.log('user.email:', user.email)
+  console.log('user.name:', user.name)
   const data = {
     "username": user.username,
     "email": user.email,
     "emailVisibility": true,
-    "password": user.password,
-    "passwordConfirm": user.passwordConfirmation,
+    "password": 'johndoe123',
+    "passwordConfirm": 'johndoe123',
     "name": user.name,
-    "description": user.description,
+    "description": '',
   };
+  console.log('pocketbaseURL:', pocketbaseURL);
+  const pb = new PocketBase(pocketbaseURL);
+  //await pb.admins.authWithPassword(adminEmail, adminPassword);
+
+  console.log('user:', user);
+  console.log('user.username:', user.username)
+  console.log('user.email:', user.email)
+  console.log('user.name:', user.name)
+
   console.log('id:', user.id, ', data:', data);
   try {
     const record = await pb.collection('users').update(user.id, data);
