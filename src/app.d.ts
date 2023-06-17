@@ -8,6 +8,15 @@ declare namespace App {
   // interface Platform {}
 }
 
+declare class TxnInput {
+  userAddr: string
+  tokenAddr: string
+  toAddr: string
+  fromAddr: string
+  chainName: string
+  amount1: number
+  amount2: number
+}
 declare class Contact {
   id: string
   name: string

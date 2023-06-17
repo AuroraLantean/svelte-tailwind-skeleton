@@ -41,8 +41,10 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@moralisweb3/common-evm-utils": "^2.22.2",
 		"@radixdlt/babylon-gateway-api-sdk": "1.0.0-rc.1.8",
 		"@radixdlt/radix-dapp-toolkit": "^0.2.0",
+		"moralis": "^2.22.2",
 		"pocketbase": "^0.15.2"
 	}
 }

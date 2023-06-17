@@ -20,5 +20,6 @@
 		<li><a href="/auth/login" on:click={drawerClose}>Login/Register</a></li>
 		<li><a href="/auth/profile" on:click={drawerClose}>User Profile</a></li>
 		<li><a href="/userMgmt" on:click={drawerClose}>User Management</a></li>
+		<li><a href="/ethereum" on:click={drawerClose}>Ethereum</a></li>
   </ul>
 </nav>
