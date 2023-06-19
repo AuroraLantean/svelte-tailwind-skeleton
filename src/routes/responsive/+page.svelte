@@ -9,7 +9,7 @@
 
 	<div class="flex flex-wrap gap-2">
 		<div
-			class="basis-full md:basis-[30%] flex bg-cover bg-center flex-1 h-[300px] bg-[url('/src/images/categories/shoes.jpg')]"
+			class="basis-full md:basis-[30%] flex bg-cover bg-center flex-1 h-[300px] bg-[url('/src/images/categories/shoes2.jpg')]"
 		>
 			<div class="m-auto bg-black p-3 text-white font-bold text-4xl uppercase rounded-xl">
 				Shoes
@@ -35,16 +35,21 @@
 			</div>
 		</div>
 	</div>
-	<h2 class="text-center text-3xl py-6 font-bold mb-4">Featured products</h2>
+
+  <h2 class="text-center text-3xl py-6 font-bold mb-4">Featured products</h2>
 	<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mb-8 gap-2">
 		<div class="p-2 bg-white rounded-md">
-			<img src="/src/images/products/p1.jpg" class="h-52 w-full object-cover" alt="product-p1"/>
+      <div
+			class="bg-cover h-52 bg-[url('/src/images/products/p1.jpg')]"
+		></div>
 			<div class="text-center mt-2 mb-2">
 				<strong class="font-bold">Plain white t-shirt</strong>
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
 				<p class="text-lg font-bold italic mt-2 mb-2">from $9.99</p>
 				<button
-					class="hover:bg-stone-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer"
+          type="button"
+					class="hover:bg-purple-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer btn variant-filled-primary"
+          on:click={() => handlerXyz()}
 				>
 					View item
 				</button>
@@ -57,7 +62,9 @@
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
 				<p class="text-lg font-bold italic mt-2 mb-2">from $9.99</p>
 				<button
-					class="hover:bg-stone-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer"
+          type="button"
+					class="hover:bg-purple-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer btn variant-filled-primary"
+          on:click={() => handlerXyz()}
 				>
 					View item
 				</button>
@@ -70,7 +77,9 @@
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
 				<p class="text-lg font-bold italic mt-2 mb-2">from $9.99</p>
 				<button
-					class="hover:bg-stone-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer"
+          type="button"
+					class="hover:bg-purple-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer btn variant-filled-primary"
+          on:click={() => handlerXyz()}
 				>
 					View item
 				</button>
@@ -83,7 +92,9 @@
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
 				<p class="text-lg font-bold italic mt-2 mb-2">from $9.99</p>
 				<button
-					class="hover:bg-stone-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer"
+          type="button"
+					class="hover:bg-purple-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer btn variant-filled-primary"
+          on:click={() => handlerXyz()}
 				>
 					View item
 				</button>
@@ -96,7 +107,9 @@
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
 				<p class="text-lg font-bold italic mt-2 mb-2">from $9.99</p>
 				<button
-					class="hover:bg-stone-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer"
+          type="button"
+					class="hover:bg-purple-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer btn variant-filled-primary"
+          on:click={() => handlerXyz()}
 				>
 					View item
 				</button>
@@ -109,7 +122,9 @@
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
 				<p class="text-lg font-bold italic mt-2 mb-2">from $9.99</p>
 				<button
-					class="hover:bg-stone-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer"
+          type="button"
+					class="hover:bg-purple-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer btn variant-filled-primary"
+          on:click={() => handlerXyz()}
 				>
 					View item
 				</button>
@@ -122,7 +137,9 @@
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
 				<p class="text-lg font-bold italic mt-2 mb-2">from $9.99</p>
 				<button
-					class="hover:bg-stone-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer"
+          type="button"
+					class="hover:bg-purple-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer btn variant-filled-primary"
+          on:click={() => handlerXyz()}
 				>
 					View item
 				</button>
@@ -135,7 +152,9 @@
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
 				<p class="text-lg font-bold italic mt-2 mb-2">from $9.99</p>
 				<button
-					class="hover:bg-stone-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer"
+          type="button"
+					class="hover:bg-purple-600 transition-all hover:scale-110 rounded-md p-2 bg-stone-900 text-white font-bold text-lg cursor-pointer btn variant-filled-primary"
+          on:click={() => handlerXyz()}
 				>
 					View item
 				</button>
