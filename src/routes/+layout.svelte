@@ -11,6 +11,7 @@
 		AppShell,
 		Avatar,
 		Drawer,
+		LightSwitch,
 		Modal,
 		Toast,
 		drawerStore
@@ -44,7 +45,8 @@
 				<strong class="text-xl uppercase">Noted</strong>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
-				<Avatar initials="JD" width="w-10" background="bg-primary-500" />
+        <LightSwitch />
+        <Avatar initials="JD" width="w-10" background="bg-primary-500" />
 			</svelte:fragment>
 		</AppBar>
   </svelte:fragment>
