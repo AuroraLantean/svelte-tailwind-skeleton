@@ -2,6 +2,7 @@
 	import { Table } from '@skeletonlabs/skeleton';
 	import type { TableSource } from '@skeletonlabs/skeleton';
 	import { tableMapperValues } from '@skeletonlabs/skeleton';
+	import { capitalizeFirst } from '@store/lib';
 	import { addUser, deleteUser, getUsers, updateUser } from '@store/users.js';
 	import { onMount } from 'svelte';
 
@@ -85,7 +86,7 @@
 
 <div class="container h-full flex">
 	<div class="space-y-5">
-		<h1 class="h1">{pagetype.charAt(0).toUpperCase() + pagetype.slice(1)}</h1>
+    <h1 class="h1">{capitalizeFirst(pagetype)}</h1>
 	</div>
 </div>
 

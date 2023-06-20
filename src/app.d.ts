@@ -9,13 +9,12 @@ declare namespace App {
 }
 
 declare class TxnInput {
-  userAddr: string
-  tokenAddr: string
-  toAddr: string
-  fromAddr: string
   chainName: string
-  amount1: number
-  amount2: number
+  addr1: string
+  addr2: string
+  tokenAddr: string
+  amount1: string
+  amount2: string
 }
 declare class Contact {
   id: string

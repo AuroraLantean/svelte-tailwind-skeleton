@@ -1,5 +1,5 @@
 export async function load() {
-  console.log('ethereum/load()');
+  console.log('+page.server.ts/load()');
   return {
     status: 'ok'
   }

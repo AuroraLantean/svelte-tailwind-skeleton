@@ -21,6 +21,7 @@ const config = {
       "@components": "./src/components/*",
       //"@actions": "./src/actions/*",
       "@store": "./src/store/*",
+      "@contracts": "./src/contracts/*",
       //"@db": "./src/db/*",
       //"@api": "./src/api/*"
     }

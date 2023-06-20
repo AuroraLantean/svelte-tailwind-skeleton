@@ -9,8 +9,8 @@ export async function GET({params, url}) {
   const queryString = url.searchParams.toString();
   console.log('queryString: ' + queryString);
   console.log('addr:', addr, typeof addr, ', chain:', chain, typeof chain);
-  const chainObj = getChainObj(chain);
-  console.log('chainObj:', chainObj);
+  const [chainObj, chainStr] = getChainObj(chain);
+  console.log('chainObj:', chainObj, ', chainStr:', chainStr);
 
   // await Moralis.start({
   //   apiKey: PRIVATE_MORALIS,

@@ -1,74 +1,71 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { toastStore, type ToastSettings, ProgressRadial } from '@skeletonlabs/skeleton';
-	import { EvmChain } from '@moralisweb3/common-evm-utils';
-	import { getChainStr } from '@store/lib';
-  import { PUBLIC_ADDR } from "$env/static/public";
-  console.log("PUBLIC_ADDR:", PUBLIC_ADDR);
-  
-	let chainObj = EvmChain.ETHEREUM;
-	let addr = PUBLIC_ADDR;
-	let nativeBalance: any;
-	let tokenBalances: any;
-	let nftmetadata: any;
+	import { PUBLIC_ADDR } from '$env/static/public';
+	import { ethersInit, getBalanceEth, getTokenBalance } from '@store/ethers';
+	import { capitalizeFirst, getChainObj } from '@store/lib';
+	const lg = console.log;
+	lg('PUBLIC_ADDR:', PUBLIC_ADDR);
+
+  let ethBalance = '';
+  let tokenBalance = '';
+  let tokenAllowance = '';
+	let nativeBalance: any = '';
+	let tokenBalances: any = '';
+	let nftmetadata: any = '';
+	let items: any[] = [];
 	//------------------------==
 	// Global states
 	export let pagetype = 'Ethereum Related Chains';
-	let networkStatus = '';
-	let contractAddr = '';
-	let priceOut = '';
+	let chainDetected = '';
+	let addrDetected = '';
+	let transferResult = '';
+	let approveResult = '';
 	let receipt = '';
 	let setPriceInput = '1';
-	let tokBal = '';
-	let ethBal = '';
-	const lg = console.log;
 	let res: any;
 	let t: ToastSettings;
 	let data: any;
-	let chainStr = '';
+	let ethBalance_loading = false;
+	let tokenBalance_loading = false;
+	let tokenAllowance_loading = false;
 	let getNativeBalance_loading = false;
-	let getBalances_loading = false;
 	let getTokenbalances_loading = false;
 	let getNftmetadata_loading = false;
+	let handleTransfer_loading = false;
+	let handleApprove_loading = false;
+	let sendPost_loading = false;
 
-	let buyToken_loading = false;
-	let getPrice_loading = false;
-	let setPrice_loading = false;
-
-	let isAfterLoadEvent = false;
-	lg('isAfterLoadEvent: ' + isAfterLoadEvent);
+	let isOnMount = false;
+	lg('isOnMount:', isOnMount);
 	const inputDefault = {
-		userAddr: '',
+		chainName: 'sepolia',
+		addr1: PUBLIC_ADDR,
+		addr2: '',
 		tokenAddr: '',
-		toAddr: '',
-		fromAddr: '',
-		chainName: 'ethereum',
-		amount1: 0,
-		amount2: 0
+		amount1: '',
+		amount2: ''
 	};
 	export let input = inputDefault;
 	const resetInput = () => {
-		input.userAddr = '';
-		input.tokenAddr = '';
-		input.toAddr = '';
-		input.fromAddr = '';
 		input.chainName = '';
-		input.amount1 = 0;
-		input.amount2 = 0;
-	};
-	const handleGetData = async (input: TxnInput) => {
-		console.log('handleGetData() ... input:', input);
-		//await addUser(input);
-		//goto('/auth/login');
+		input.addr1 = '';
+		input.addr2 = '';
+		input.tokenAddr = '';
+		input.amount1 = '';
+		input.amount2 = '';
 	};
 	onMount(async () => {
 		lg('onMount');
-		isAfterLoadEvent = true;
-		lg('isAfterLoadEvent: ' + isAfterLoadEvent);
-		chainStr = getChainStr(chainObj);
-		lg('addr: ', addr, ', chainStr: ', chainStr);
-		lg(chainStr === '0x1');
-	});
+		isOnMount = true;
+		lg('isOnMount:', isOnMount);
+		lg('input.addr1: ', input.addr1);
+    const out = await ethersInit();
+    addrDetected = out[1];
+    const [chainObj, chainStr] = getChainObj(out[0]);
+    lg('chainObj:', chainObj, ', chainStr:', chainStr);
+    chainDetected = capitalizeFirst(chainStr);
+  });
 	export const getToastErr = (err: string): ToastSettings => {
 		return {
 			message: 'Transaction failed. Error message: ' + err,
@@ -84,52 +81,38 @@
 		};
 	};
 
-	const getBalances = async () => {
-		lg('getBalances()');
-		getBalances_loading = true;
-		await getNativeBalance();
-		//await getTokenBals();
-		getBalances_loading = false;
-	};
-
-	const getNativeBalance = async () => {
-		lg('getNativeBalance()');
+	const getNativeBalcM = async () => {
+		lg('getNativeBalcM()');
 		getNativeBalance_loading = true;
-		chainStr = getChainStr(chainObj);
-		lg('addr:', addr, ', chainStr: ', chainStr);
-		const res = await fetch(`/api/${chainStr}/${addr}/nativebalance`);
-    lg('nativebalance res:', res);
-		nativeBalance = await res.json();//string
+		lg('addr:', input.addr1, ', chainName:', input.chainName);
+		const res = await fetch(`/api/${input.chainName}/${input.addr1}/nativebalance`);
+		lg('nativebalance res:', res);
+		nativeBalance = await res.json(); //string
 		lg('nativeBalance:', nativeBalance, typeof nativeBalance);
 		getNativeBalance_loading = false;
 	};
-	const getTokenbalances = async () => {
-		lg('getTokenbalances()');
+	const getTokbalcsM = async () => {
+		lg('getTokbalcsM()');
 		getTokenbalances_loading = true;
-		chainStr = getChainStr(chainObj);
-		lg('addr:', addr, ', chainStr: ', chainStr);
-		const res = await fetch(`/api/${chainStr}/${addr}/tokenbalances`);
-		tokenBalances = await res.json();//array of xyz
+		lg('addr:', input.addr1, ', chainName:', input.chainName);
+		const res = await fetch(`/api/${input.chainName}/${input.addr1}/tokenbalances`);
+		tokenBalances = await res.json(); //array of xyz
 		lg('tokenBalances:', tokenBalances, typeof tokenBalances);
 		getTokenbalances_loading = false;
 	};
-	const getNftmetadata = async () => {
-		lg('getNftmetadata()');
+	const getNftmetadataM = async () => {
+		lg('getNftmetadataM()');
 		getNftmetadata_loading = true;
-		chainStr = getChainStr(chainObj);
-		lg('addr:', addr, ', chainStr: ', chainStr);
-		const res = await fetch(`/api/${chainStr}/${addr}/nftmetadata`);
-		nftmetadata = await res.json();//array of xyz
+		lg('addr:', input.addr1, ', chainName:', input.chainName);
+		const res = await fetch(`/api/${input.chainName}/${input.addr1}/nftmetadata`);
+		nftmetadata = await res.json(); //array of xyz
 		lg('nftmetadata:', nftmetadata, typeof nftmetadata);
 		getNftmetadata_loading = false;
 	};
 
-	//Write Functions
-	const buyGumballHandler = async () => {
-		lg('buyGumballHandler()');
-		buyToken_loading = true;
-		//res = await buyGumball(rdt, userAddr, compoAddr);
-		buyToken_loading = false;
+  const handleTransfer = async (input: TxnInput) => {
+		lg('handleTransfer() ... input:', input);
+		handleTransfer_loading = true;
 		if (res.error) {
 			t = getToastErr(JSON.stringify(res.error));
 			toastStore.trigger(t);
@@ -137,81 +120,120 @@
 		}
 		t = getToastOk();
 		toastStore.trigger(t);
-
 		receipt = JSON.stringify(res.txn, null, 2);
-		//tokBal = await getTokenBalance(userAddr, tokenAddr);
-		//ethBal = await getethBal(userAddr);
-	}; //buyGumballHandler
+		handleTransfer_loading = false;
 
-	const getPriceHandler = async () => {
-		lg('getPriceHandler()');
-		getPrice_loading = true;
-		//res = await getPrice(rdt, compoAddr);
-		getPrice_loading = false;
-		if (res.error) {
-			t = getToastErr(JSON.stringify(res.error));
-			toastStore.trigger(t);
-			return true;
-		}
+	};
+	const handleApprove = async (input: TxnInput) => {
+		lg('handleApprove() ... input:', input);
+	};
+	const handleEthBalance = async (input: TxnInput) => {
+		lg('handleEthBalance() ... input:', input);
+    ethBalance_loading = true;
+    const balns = await getBalanceEth(input.addr1);
+    lg('balances:', balns);
+    ethBalance = balns[0];
+    ethBalance_loading = false;
+	};
+	const handleTokenBalance = async (input: TxnInput) => {
+		lg('handleTokenBalance() ... input:', input);
+    tokenBalance_loading = true;
+    tokenBalance = await getTokenBalance(input.addr1);
+    lg('tokenBalance:', tokenBalance);
+    tokenBalance_loading = false;
+
+	};
+	const handleAllowance = async (input: TxnInput) => {
+		lg('handleAllowance() ... input:', input);
+	};
+
+	const sendPost = async () => {
+		lg('sendPost()...');
+		sendPost_loading = true;
+		const amount = '10';
+		const res = await fetch('/apiEndpoint', {
+			method: 'POST',
+			body: JSON.stringify({ amount }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		const { id } = await res.json();
+		items = [
+			...items,
+			{
+				id,
+				amount
+			}
+		];
+		sendPost_loading = false;
+		// if (res.error) {
+		// 	t = getToastErr(JSON.stringify(res.error));
+		// 	toastStore.trigger(t);
+		// 	return true;
+		// }
 		t = getToastOk();
 		toastStore.trigger(t);
-
-		priceOut = res.data;
-		lg('priceOut:', priceOut);
-	}; //GetPrice
-
-	const setPriceHandler = async () => {
-		lg('setPriceHandler()');
-		setPrice_loading = true;
-		//res = await setPrice(rdt, userAddr, compoAddr, admin_badge, setPriceInput);
-		setPrice_loading = false;
-		if (res.error) {
-			t = getToastErr(JSON.stringify(res.error));
-			toastStore.trigger(t);
-			return true;
-		}
-		t = getToastOk();
-		toastStore.trigger(t);
-
-		//priceOut = res.data;
-		//lg('priceOut:', priceOut);
-	}; //setPriceHandler
+	}; //sendPost
 </script>
-
-<!-- HTML Elements -->
 
 <div class="container h-full mx-auto flex justify-center items-center">
 	<div class="space-y-5">
-		<h1 class="h1">{pagetype.charAt(0).toUpperCase() + pagetype.slice(1)}</h1>
+		<h1 class="h1">{capitalizeFirst(pagetype)}</h1>
 	</div>
 </div>
 
 <div class="card mt-4 p-4 w-full text-token space-y-4">
-	{#if isAfterLoadEvent}
+	{#if isOnMount}
 		<div class="flex flex-col">
-			<div class="mt-2">Network: {networkStatus}</div>
-			<div class="mt-2">User Address: {input.userAddr}</div>
+			<div class="mt-2">Detected Chain: {chainDetected}</div>
+			<div class="mt-2">Detected Address: {addrDetected}</div>
 		</div>
 	{/if}
 </div>
 
-
 <div class="card p-4 mx-auto w-96 space-y-4 mt-3">
+	<label class="label">
+		<span>Network</span>
+		<select class="select" bind:value={input.chainName}>
+			<option value="ethereum">Ethereum Mainnet</option>
+			<option value="sepolia">Sepolia</option>
+			<option value="goerli">Goerli</option>
+			<option value="polygon">Polygon</option>
+			<option value="mumbai">Mumbai</option>
+			<option value="bsc">BSC</option>
+			<option value="bsc_testnet">BSC_Testnet</option>
+			<option value="avalanche">Avalanche</option>
+			<option value="fantom">Fantom</option>
+			<option value="cronos">Cronos</option>
+			<option value="palm">Palm</option>
+			<option value="arbitrum">Arbitrum</option>
+		</select>
+	</label>
+	<label class="label">
+		<span>Address1</span>
+		<input
+			class="input"
+			type="text"
+			placeholder="Enter address1 here..."
+			bind:value={input.addr1}
+		/>
+	</label>
+	<label class="label">
+		<span>Address2</span>
+		<input
+			class="input"
+			type="text"
+			placeholder="Enter address2 here..."
+			bind:value={input.addr2}
+		/>
+	</label>
 	<label class="label">
 		<span>Token Address</span>
 		<input
 			class="input"
 			type="text"
 			placeholder="Enter token address here..."
-			bind:value={input.tokenAddr}
-		/>
-	</label>
-	<label class="label">
-		<span>To Address</span>
-		<input
-			class="input"
-			type="text"
-			placeholder="Enter to address here..."
 			bind:value={input.tokenAddr}
 		/>
 	</label>
@@ -224,41 +246,65 @@
 			bind:value={input.amount1}
 		/>
 	</label>
-	<label class="label">
-		<span>Chain Name</span>
-		<select class="select" bind:value={input.chainName}>
-			<option value="ethereum">Ethereum Mainnet</option>
-			<option value="sepolia">Sepolia</option>
-			<option value="polygon">Polygon</option>
-		</select>
-	</label>
-
-	<div class="container h-full mx-auto flex flex-row justify-between">
-		<button
-			type="button"
-			class="btn variant-filled-primary"
-			on:click={() => {
-				handleGetData(input);
-				resetInput();
-			}}
-		>
-			Send Transaction
-		</button>
-
-		<button
-			type="button"
-			class="btn variant-ghost-error"
-			on:click={() => {
-				resetInput();
-			}}
-		>
-			Cancel
-		</button>
-	</div>
 </div>
 
-
 <div class="card mt-4 p-4 w-full text-token space-y-4">
+	<div class="flex flex-row">
+		{#if ethBalance_loading}
+			<ProgressRadial
+				...
+				stroke={220}
+				meter="stroke-primary-500"
+				track="stroke-primary-500/30"
+				width="w-14"
+			/>
+		{:else}
+			<button type="button" class="btn variant-filled-primary" on:click={() => handleEthBalance(input)}
+				>Get ETH Balance</button
+			>
+		{/if}
+		<div class="mt-2 ml-2">
+			ETH Balance: {ethBalance}
+		</div>
+	</div>
+	<div class="flex flex-row">
+		{#if tokenBalance_loading}
+			<ProgressRadial
+				...
+				stroke={220}
+				meter="stroke-primary-500"
+				track="stroke-primary-500/30"
+				width="w-14"
+			/>
+		{:else}
+			<button type="button" class="btn variant-filled-primary" on:click={() => handleTokenBalance(input)}
+				>Get Token Balance</button
+			>
+		{/if}
+		<div class="mt-2 ml-2">
+			Token Balance: {tokenBalance}
+		</div>
+	</div>
+
+	<div class="flex flex-row">
+		{#if tokenAllowance_loading}
+			<ProgressRadial
+				...
+				stroke={220}
+				meter="stroke-primary-500"
+				track="stroke-primary-500/30"
+				width="w-14"
+			/>
+		{:else}
+			<button type="button" class="btn variant-filled-primary" on:click={() => handleAllowance(input)}
+				>Get Token Allowance</button
+			>
+		{/if}
+		<div class="mt-2 ml-2">
+			Token Allowance: {tokenAllowance}
+		</div>
+	</div>
+
 	<div class="flex flex-row">
 		{#if getNativeBalance_loading}
 			<ProgressRadial
@@ -269,7 +315,7 @@
 				width="w-14"
 			/>
 		{:else}
-			<button type="button" class="btn variant-filled-secondary" on:click={() => getNativeBalance()}
+			<button type="button" class="btn variant-filled-secondary" on:click={() => getNativeBalcM()}
 				>Get Native Balance</button
 			>
 		{/if}
@@ -288,7 +334,7 @@
 				width="w-14"
 			/>
 		{:else}
-			<button type="button" class="btn variant-filled-secondary" on:click={() => getTokenbalances()}
+			<button type="button" class="btn variant-filled-secondary" on:click={() => getTokbalcsM()}
 				>Get Token Balances</button
 			>
 		{/if}
@@ -307,7 +353,7 @@
 				width="w-14"
 			/>
 		{:else}
-			<button type="button" class="btn variant-filled-secondary" on:click={() => getNftmetadata()}
+			<button type="button" class="btn variant-filled-secondary" on:click={() => getNftmetadataM()}
 				>Get NFT Metadata</button
 			>
 		{/if}
@@ -317,7 +363,7 @@
 	</div>
 
 	<div class="flex flex-row">
-		{#if buyToken_loading}
+		{#if handleTransfer_loading}
 			<ProgressRadial
 				...
 				stroke={220}
@@ -326,10 +372,13 @@
 				width="w-16"
 			/>
 		{:else}
-			<button type="button" class="btn variant-filled-error" on:click={buyGumballHandler}
-				>Buy 1 Token</button
+			<button type="button" class="btn variant-filled-error" on:click={() => handleTransfer(input)}
+				>Transfer Token</button
 			>
 		{/if}
+    <div class="mt-2 ml-2">
+			{transferResult}
+		</div>
 	</div>
 
 	<div class="container">
@@ -341,7 +390,7 @@
 	</div>
 
 	<div class="flex flex-row">
-		{#if getPrice_loading}
+		{#if handleApprove_loading}
 			<ProgressRadial
 				...
 				stroke={220}
@@ -350,30 +399,13 @@
 				width="w-14"
 			/>
 		{:else}
-			<button type="button" class="btn variant-filled-secondary" on:click={getPriceHandler}
-				>Get Price</button
+			<button type="button" class="btn variant-filled-error" on:click={() => handleApprove(input)}
+				>Approve Allowance</button
 			>
 		{/if}
-		<div class="mt-2">
-			Price from GetPrice: {priceOut}
+		<div class="mt-2 ml-2">
+			{approveResult}
 		</div>
 	</div>
 
-	<div class="flex flex-row">
-		<input type="text" placeholder="New Price" bind:value={setPriceInput} />
-		{#if setPrice_loading}
-			<ProgressRadial
-				...
-				stroke={220}
-				meter="stroke-primary-500"
-				track="stroke-primary-500/30"
-				width="w-14"
-			/>
-		{:else}
-			<button type="button" class="btn variant-filled-error" on:click={setPriceHandler}
-				>Set Price</button
-			>
-		{/if}
-		<div class="mt-2">Price from SetPrice: Not returned</div>
-	</div>
 </div>

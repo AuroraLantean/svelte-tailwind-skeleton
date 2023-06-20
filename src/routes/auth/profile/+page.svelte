@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { capitalizeFirst } from '@store/lib';
 	import { deleteUser, getDbInfo, getUser, logoutUser, updateUser } from '@store/users';
 	import { onMount } from 'svelte';
 
@@ -51,7 +52,7 @@
 
 <div class="container h-full mx-auto flex justify-center items-center">
 	<div class="space-y-5">
-		<h1 class="h1">{pagetype.charAt(0).toUpperCase() + pagetype.slice(1)}</h1>
+    <h1 class="h1">{capitalizeFirst(pagetype)}</h1>
 	</div>
 </div>
 

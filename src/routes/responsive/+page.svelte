@@ -56,7 +56,9 @@
 			</div>
 		</div>
 		<div class="p-2 bg-white rounded-md">
-			<img src="/src/images/products/p2.jpg" class="h-52 w-full object-cover" alt="product-p2" />
+      <div
+			class="bg-cover h-52 bg-[url('/src/images/products/p2.jpg')]"
+		></div>
 			<div class="text-center mt-2 mb-2">
 				<strong class="font-bold">White "out case" t-shirt</strong>
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
@@ -71,7 +73,9 @@
 			</div>
 		</div>
 		<div class="p-2 bg-white rounded-md">
-			<img src="/src/images/products/p3.jpg" class="h-52 w-full object-cover" alt="product-p3" />
+      <div
+			class="bg-cover h-52 bg-[url('/src/images/products/p3.jpg')]"
+		></div>
 			<div class="text-center mt-2 mb-2">
 				<strong class="font-bold">Red "not today" t-shirt</strong>
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
@@ -86,7 +90,9 @@
 			</div>
 		</div>
 		<div class="p-2 bg-white rounded-md">
-			<img src="/src/images/products/p4.jpg" class="h-52 w-full object-cover" alt="product-p4" />
+      <div
+			class="bg-cover h-52 bg-[url('/src/images/products/p4.jpg')]"
+		></div>
 			<div class="text-center mt-2 mb-2">
 				<strong class="font-bold">Black bones t-shirt</strong>
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
@@ -101,7 +107,9 @@
 			</div>
 		</div>
 		<div class="p-2 bg-white rounded-md">
-			<img src="/src/images/products/p5.jpg" class="h-52 w-full object-cover" alt="product-p5" />
+      <div
+			class="bg-cover h-52 bg-[url('/src/images/products/p5.jpg')]"
+		></div>
 			<div class="text-center mt-2 mb-2">
 				<strong class="font-bold">Plain white t-shirt</strong>
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
@@ -116,7 +124,9 @@
 			</div>
 		</div>
 		<div class="p-2 bg-white rounded-md">
-			<img src="/src/images/products/p6.jpg" class="h-52 w-full object-cover" alt="product-p6" />
+      <div
+			class="bg-cover h-52 bg-[url('/src/images/products/p6.jpg')]"
+		></div>
 			<div class="text-center mt-2 mb-2">
 				<strong class="font-bold">Grey baseball cap</strong>
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
@@ -131,7 +141,9 @@
 			</div>
 		</div>
 		<div class="p-2 bg-white rounded-md">
-			<img src="/src/images/products/p7.jpg" class="h-52 w-full object-cover" alt="product-p7" />
+      <div
+			class="bg-cover h-52 bg-[url('/src/images/products/p7a1.jpg')]"
+		></div>
 			<div class="text-center mt-2 mb-2">
 				<strong class="font-bold">White dreamer t-shirt</strong>
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>
@@ -146,7 +158,9 @@
 			</div>
 		</div>
 		<div class="p-2 bg-white rounded-md">
-			<img src="/src/images/products/p8.jpg" class="h-52 w-full object-cover" alt="product-p8" />
+      <div
+			class="bg-cover h-52 bg-[url('/src/images/products/p8a2.jpg')]"
+		></div>
 			<div class="text-center mt-2 mb-2">
 				<strong class="font-bold">Gold rim sunglasses</strong>
 				<p class="text-slate-500">A plain white t-shirt perfect for summer</p>

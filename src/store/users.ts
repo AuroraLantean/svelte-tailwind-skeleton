@@ -1,7 +1,7 @@
 import { writable, get } from "svelte/store";
 import PocketBase from 'pocketbase';
 import { PUBLIC_POCKETBASE } from "$env/static/public";
-console.log("PUBLIC env:", PUBLIC_POCKETBASE);
+//console.log("PUBLIC env:", PUBLIC_POCKETBASE);
 const pocketbaseURL = PUBLIC_POCKETBASE;
 
 export const DbStore = writable<DbInfo>({
@@ -96,7 +96,7 @@ export const loginUser = async (user: User): UserInfo => {
 // getUsers
 export const getUsers = async (): User[] => {
   console.log('getUsers()...');
-  console.log('pocketbaseURL:', pocketbaseURL);
+  //console.log('pocketbaseURL:', pocketbaseURL);
   const pb = new PocketBase(pocketbaseURL);
 
   try {
