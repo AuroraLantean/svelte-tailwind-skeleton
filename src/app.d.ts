@@ -8,11 +8,16 @@ declare namespace App {
   // interface Platform {}
 }
 
+declare class NftMetadataM {
+  name: string
+  amount: number
+  metadata: any
+}
 declare class TxnInput {
   chainName: string
+  ctrtAddr: string
   addr1: string
   addr2: string
-  tokenAddr: string
   amount1: string
   amount2: string
 }

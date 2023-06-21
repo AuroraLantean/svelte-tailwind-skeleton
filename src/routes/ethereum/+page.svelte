@@ -2,56 +2,60 @@
 	import { onMount } from 'svelte';
 	import { toastStore, type ToastSettings, ProgressRadial } from '@skeletonlabs/skeleton';
 	import { PUBLIC_ADDR } from '$env/static/public';
-	import { ethersInit, getBalanceEth, getTokenBalance } from '@store/ethers';
+	import { ethersInit, getBalanceEth, erc20BalanceOf, erc20Transfer, erc20Approve, erc20Allowance, erc721Transfer, erc721BalanceOf } from '@store/ethers';
 	import { capitalizeFirst, getChainObj } from '@store/lib';
+  import goldcoin from "@contracts/goldcoin.json";
+  import dragonNft from "@contracts/erc721Dragon.json";
+
 	const lg = console.log;
-	lg('PUBLIC_ADDR:', PUBLIC_ADDR);
+	lg('PUBLIC_ADDR:', PUBLIC_ADDR, ', goldcoin addr:', goldcoin.address, ', dragonNft addr:', dragonNft.address );
 
   let ethBalance = '';
   let tokenBalance = '';
+  let nftBalance = '';
   let tokenAllowance = '';
 	let nativeBalance: any = '';
 	let tokenBalances: any = '';
 	let nftmetadata: any = '';
 	let items: any[] = [];
 	//------------------------==
-	// Global states
 	export let pagetype = 'Ethereum Related Chains';
+  export let ctrtName = 'goldcoin';
 	let chainDetected = '';
 	let addrDetected = '';
-	let transferResult = '';
 	let approveResult = '';
 	let receipt = '';
-	let setPriceInput = '1';
 	let res: any;
 	let t: ToastSettings;
 	let data: any;
 	let ethBalance_loading = false;
-	let tokenBalance_loading = false;
+	let hErc20BalanceOf_loading = false;
 	let tokenAllowance_loading = false;
 	let getNativeBalance_loading = false;
 	let getTokenbalances_loading = false;
 	let getNftmetadata_loading = false;
-	let handleTransfer_loading = false;
-	let handleApprove_loading = false;
+	let hErc20Transfer_loading = false;
+	let hErc20Approve_loading = false;
+	let hErc721Transfer_loading = false;
+	let hErc721BalanceOf_loading = false;
 	let sendPost_loading = false;
 
 	let isOnMount = false;
 	lg('isOnMount:', isOnMount);
 	const inputDefault = {
 		chainName: 'sepolia',
-		addr1: PUBLIC_ADDR,
-		addr2: '',
-		tokenAddr: '',
+		ctrtAddr: '',
+		addr1: '',
+		addr2: PUBLIC_ADDR,
 		amount1: '',
 		amount2: ''
 	};
 	export let input = inputDefault;
 	const resetInput = () => {
 		input.chainName = '';
+		input.ctrtAddr = '';
 		input.addr1 = '';
 		input.addr2 = '';
-		input.tokenAddr = '';
 		input.amount1 = '';
 		input.amount2 = '';
 	};
@@ -59,14 +63,33 @@
 		lg('onMount');
 		isOnMount = true;
 		lg('isOnMount:', isOnMount);
-		lg('input.addr1: ', input.addr1);
     const out = await ethersInit();
     addrDetected = out[1];
+    input.addr1 = addrDetected;
+    //input.ctrtAddr = goldcoin.address;
+		lg('input.addr1: ', input.addr1, ', input.addr2: ', input.addr2);
     const [chainObj, chainStr] = getChainObj(out[0]);
     lg('chainObj:', chainObj, ', chainStr:', chainStr);
     chainDetected = capitalizeFirst(chainStr);
   });
-	export const getToastErr = (err: string): ToastSettings => {
+  $: {
+    input.ctrtAddr = getCtrtAddr(ctrtName);
+  }
+  export const getCtrtAddr = (ctrtName: string) => {
+    let ctrtAddr = '';
+    switch (ctrtName) {
+      case 'goldcoin':
+        ctrtAddr = goldcoin.address;
+        break;
+      case 'erc721Dragon':
+        ctrtAddr = dragonNft.address;
+        break;
+    }
+    lg('getCtrtAddr()... ctrtAddr', ctrtAddr);
+    return 	ctrtAddr;
+	};
+
+  export const getToastErr = (err: string): ToastSettings => {
 		return {
 			message: 'Transaction failed. Error message: ' + err,
 			background: 'variant-filled-error',
@@ -105,27 +128,57 @@
 		getNftmetadata_loading = true;
 		lg('addr:', input.addr1, ', chainName:', input.chainName);
 		const res = await fetch(`/api/${input.chainName}/${input.addr1}/nftmetadata`);
-		nftmetadata = await res.json(); //array of xyz
+		const out = await res.json(); //array of xyz
+    lg('out:', out)
+    nftmetadata = JSON.stringify(out);
 		lg('nftmetadata:', nftmetadata, typeof nftmetadata);
 		getNftmetadata_loading = false;
 	};
 
-  const handleTransfer = async (input: TxnInput) => {
-		lg('handleTransfer() ... input:', input);
-		handleTransfer_loading = true;
-		if (res.error) {
-			t = getToastErr(JSON.stringify(res.error));
+  const hErc20Transfer = async (input: TxnInput) => {
+		lg('hErc20Transfer() ... input:', input);
+		hErc20Transfer_loading = true;
+		const out = await erc20Transfer(input);
+    if (out) {
+      t = getToastErr(JSON.stringify(out));
 			toastStore.trigger(t);
+      hErc20Transfer_loading = false;
 			return true;
 		}
 		t = getToastOk();
 		toastStore.trigger(t);
-		receipt = JSON.stringify(res.txn, null, 2);
-		handleTransfer_loading = false;
-
+		//receipt = JSON.stringify(res.txn, null, 2);
+		hErc20Transfer_loading = false;
 	};
-	const handleApprove = async (input: TxnInput) => {
-		lg('handleApprove() ... input:', input);
+	const hErc20Approve = async (input: TxnInput) => {
+		lg('hErc20Approve() ... input:', input);
+		hErc20Approve_loading = true;
+		const out = await erc20Approve(input);
+    if (out) {
+      t = getToastErr(JSON.stringify(out));
+			toastStore.trigger(t);
+      hErc20Approve_loading = false;
+			return true;
+		}
+		t = getToastOk();
+		toastStore.trigger(t);
+		//receipt = JSON.stringify(res.txn, null, 2);
+		hErc20Approve_loading = false;
+	};
+  const hErc721Transfer = async (input: TxnInput) => {
+		lg('hErc721Transfer() ... input:', input);
+		hErc721Transfer_loading = true;
+		const out = await erc721Transfer(input);
+    if (out) {
+      t = getToastErr(JSON.stringify(out));
+			toastStore.trigger(t);
+      hErc721Transfer_loading = false;
+			return true;
+		}
+		t = getToastOk();
+		toastStore.trigger(t);
+		//receipt = JSON.stringify(res.txn, null, 2);
+		hErc721Transfer_loading = false;
 	};
 	const handleEthBalance = async (input: TxnInput) => {
 		lg('handleEthBalance() ... input:', input);
@@ -135,16 +188,26 @@
     ethBalance = balns[0];
     ethBalance_loading = false;
 	};
-	const handleTokenBalance = async (input: TxnInput) => {
-		lg('handleTokenBalance() ... input:', input);
-    tokenBalance_loading = true;
-    tokenBalance = await getTokenBalance(input.addr1);
+	const hErc20BalanceOf = async (input: TxnInput) => {
+		lg('hErc20BalanceOf() ... input:', input);
+    hErc20BalanceOf_loading = true;
+    tokenBalance = await erc20BalanceOf(input);
     lg('tokenBalance:', tokenBalance);
-    tokenBalance_loading = false;
-
+    hErc20BalanceOf_loading = false;
 	};
-	const handleAllowance = async (input: TxnInput) => {
-		lg('handleAllowance() ... input:', input);
+	const hErc721BalanceOf = async (input: TxnInput) => {
+		lg('hErc721BalanceOf() ... input:', input);
+    hErc721BalanceOf_loading = true;
+    nftBalance = await erc721BalanceOf(input);
+    lg('nftBalance:', nftBalance);
+    hErc721BalanceOf_loading = false;
+	};
+	const hErc20Allowance = async (input: TxnInput) => {
+		lg('hErc20Allowance() ... input:', input);
+    tokenAllowance_loading = true;
+    tokenAllowance = await erc20Allowance(input);
+    lg('tokenAllowance:', tokenAllowance);
+    tokenAllowance_loading = false;
 	};
 
 	const sendPost = async () => {
@@ -210,7 +273,18 @@
 			<option value="arbitrum">Arbitrum</option>
 		</select>
 	</label>
-	<label class="label">
+
+  <label class="label">
+		<span>Contract</span>
+		<select class="select" bind:value={ctrtName}>
+			<option value="goldcoin">ERC20 Gold Coin</option>
+			<option value="erc721Dragon">ERC721 Dragon NFT</option>
+		</select>
+    <span>Contract Addr:</span>
+    <input class="input" title="Contract Addr" type="text" bind:value={input.ctrtAddr} />
+	</label>
+
+  <label class="label">
 		<span>Address1</span>
 		<input
 			class="input"
@@ -228,17 +302,9 @@
 			bind:value={input.addr2}
 		/>
 	</label>
+
 	<label class="label">
-		<span>Token Address</span>
-		<input
-			class="input"
-			type="text"
-			placeholder="Enter token address here..."
-			bind:value={input.tokenAddr}
-		/>
-	</label>
-	<label class="label">
-		<span>Amount1</span>
+		<span>Amount1 in Ether(1e18 Wei) // TokenId</span>
 		<input
 			class="input"
 			type="text"
@@ -264,11 +330,11 @@
 			>
 		{/if}
 		<div class="mt-2 ml-2">
-			ETH Balance: {ethBalance}
+			ETH Balance: {ethBalance} in Ether(1e18 Wei)
 		</div>
 	</div>
 	<div class="flex flex-row">
-		{#if tokenBalance_loading}
+		{#if hErc20BalanceOf_loading}
 			<ProgressRadial
 				...
 				stroke={220}
@@ -277,12 +343,12 @@
 				width="w-14"
 			/>
 		{:else}
-			<button type="button" class="btn variant-filled-primary" on:click={() => handleTokenBalance(input)}
+			<button type="button" class="btn variant-filled-primary" on:click={() => hErc20BalanceOf(input)}
 				>Get Token Balance</button
 			>
 		{/if}
 		<div class="mt-2 ml-2">
-			Token Balance: {tokenBalance}
+			Token Balance: {tokenBalance} in Ether(1e18 Wei)
 		</div>
 	</div>
 
@@ -296,12 +362,12 @@
 				width="w-14"
 			/>
 		{:else}
-			<button type="button" class="btn variant-filled-primary" on:click={() => handleAllowance(input)}
+			<button type="button" class="btn variant-filled-primary" on:click={() => hErc20Allowance(input)}
 				>Get Token Allowance</button
 			>
 		{/if}
 		<div class="mt-2 ml-2">
-			Token Allowance: {tokenAllowance}
+			Token Allowance: {tokenAllowance} in Ether(1e18 Wei)
 		</div>
 	</div>
 
@@ -320,7 +386,7 @@
 			>
 		{/if}
 		<div class="mt-2 ml-2">
-			Native Balance: {nativeBalance}
+			Native Balance: {nativeBalance} in Ether(1e18 Wei)
 		</div>
 	</div>
 
@@ -339,7 +405,7 @@
 			>
 		{/if}
 		<div class="mt-2 ml-2">
-			Token Balances: {tokenBalances}
+			Token Balances: {tokenBalances} in Ether(1e18 Wei)
 		</div>
 	</div>
 
@@ -363,7 +429,7 @@
 	</div>
 
 	<div class="flex flex-row">
-		{#if handleTransfer_loading}
+		{#if hErc20Transfer_loading}
 			<ProgressRadial
 				...
 				stroke={220}
@@ -372,25 +438,14 @@
 				width="w-16"
 			/>
 		{:else}
-			<button type="button" class="btn variant-filled-error" on:click={() => handleTransfer(input)}
-				>Transfer Token</button
+			<button type="button" class="btn variant-filled-error" on:click={() => hErc20Transfer(input)}
+				>Transfer ERC20 Tokens</button
 			>
 		{/if}
-    <div class="mt-2 ml-2">
-			{transferResult}
-		</div>
-	</div>
-
-	<div class="container">
-		<p>
-			Receipt:<br />
-		</p>
-		<pre class="pre">{receipt}
-		</pre>
 	</div>
 
 	<div class="flex flex-row">
-		{#if handleApprove_loading}
+		{#if hErc20Approve_loading}
 			<ProgressRadial
 				...
 				stroke={220}
@@ -399,8 +454,8 @@
 				width="w-14"
 			/>
 		{:else}
-			<button type="button" class="btn variant-filled-error" on:click={() => handleApprove(input)}
-				>Approve Allowance</button
+			<button type="button" class="btn variant-filled-error" on:click={() => hErc20Approve(input)}
+				>Approve ERC20 Allowance</button
 			>
 		{/if}
 		<div class="mt-2 ml-2">
@@ -408,4 +463,45 @@
 		</div>
 	</div>
 
+  <div class="container">
+		<p>
+			Receipt:<br />
+		</p>
+		<pre class="pre">{receipt}
+		</pre>
+	</div>
+
+  <div class="flex flex-row">
+		{#if hErc721BalanceOf_loading}
+			<ProgressRadial
+				...
+				stroke={220}
+				meter="stroke-primary-500"
+				track="stroke-primary-500/30"
+				width="w-14"
+			/>
+		{:else}
+			<button type="button" class="btn variant-filled-primary" on:click={() => hErc721BalanceOf(input)}
+				>Get NFT Balance</button
+			>
+		{/if}
+		<div class="mt-2 ml-2">
+			NFT Balance: {nftBalance}
+		</div>
+	</div>
+  <div class="flex flex-row">
+		{#if hErc721Transfer_loading}
+			<ProgressRadial
+				...
+				stroke={220}
+				meter="stroke-primary-500"
+				track="stroke-primary-500/30"
+				width="w-16"
+			/>
+		{:else}
+			<button type="button" class="btn variant-filled-error" on:click={() => hErc721Transfer(input)}
+				>Transfer 1 ERC721 NFT</button
+			>
+		{/if}
+	</div>
 </div>

@@ -1,17 +1,21 @@
-import { ethers, formatEther, formatUnits, Contract} from "ethers";
-import goldcoin from "@contracts/goldcoin";
+import { ethers, formatEther, formatUnits, parseUnits, Contract } from "ethers";
+import goldcoin from "@contracts/goldcoin.json";
+import dragonNft from "@contracts/erc721Dragon.json";
+import { isEmpty } from "@store/lib";
 
 let signer = null;
 let provider;
+let isInitialized = false;
+const lg = console.log;
 
 export const ethersInit = async () => {
-  console.log("ethersInit()... goldcoin addr:", goldcoin.address);
+  lg("ethersInit()...");
   if (window.ethereum == null) {
     // If MetaMask is not installed, we use the default provider,
     // which is backed by a variety of third-party services (such
     // as INFURA). They do not have private keys installed so are
     // only have read-only access
-    console.log("MetaMask not installed; using read-only defaults")
+    lg("MetaMask not installed; using read-only defaults")
     provider = ethers.getDefaultProvider();
     return ['', ''];
 
@@ -30,13 +34,14 @@ export const ethersInit = async () => {
     const chainId = await window.ethereum.request({ method: 'eth_chainId' }).catch((err) => {
       console.error('@eth_chainId:', err);
     });;
-    console.log('detected chainId:', chainId);
+    lg('detected chainId:', chainId);
 
     const accounts = await window.ethereum.request({ method: 'eth_accounts' }).catch((err) => {
       console.error('@eth_accounts:', err);
     });
+    lg('detected accounts:', accounts);//same as account with only one item in the array
     const account = handleAccountsChanged(accounts);
-    console.log('detected account:', account);
+    lg('detected account:', account);
 
     window.ethereum.on('accountsChanged', handleAccountsChanged);
     window.ethereum.on('chainChanged', handleChainChanged);
@@ -50,10 +55,14 @@ const handleChainChanged = () => {
 function handleAccountsChanged(accounts) {
   let currentAccount = null;
   if (accounts.length === 0) {
-    console.log('Please connect to MetaMask.');
+    lg('Please connect to MetaMask.');
   } else if (accounts[0] !== currentAccount) {
     currentAccount = accounts[0];
-    console.log('currentAccount', currentAccount);
+    lg('currentAccount', currentAccount);
+    if(isInitialized){
+      window.location.reload();
+    }
+    isInitialized = true;
   }
   return currentAccount;
 }
@@ -62,7 +71,7 @@ export async function getAccount() {
   const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
     .catch((err) => {
       if (err.code === 4001) {
-        console.log('Please connect to MetaMask.');
+        lg('Please connect to MetaMask.');
       } else {
         console.error(err);
       }
@@ -80,22 +89,109 @@ export const getBalanceEth = async (addr: string): string[] => {
   return [balanceInEth, balanceInWei + ''];
 }
 
-export const getTokenBalance = async (userAddr: string): string => {
-  console.log('getTokenBalance()... userAddr: ' + userAddr);
-  // Create a contract; connected to a Provider, so it may
-  // only access read-only methods (like view and pure)
-  const goldcoinInst = new Contract(goldcoin.address, goldcoin.abi, provider)
+export const erc20BalanceOf = async (input: TxnInput): string => {
+  const userAddr = input.addr1;
+  lg('erc20BalanceOf()... userAddr:', userAddr);
+  if(isEmpty(userAddr) || isEmpty(input.ctrtAddr)){
+    return 'input invalid';
+  }
+  const goldcoinInst = new Contract(input.ctrtAddr, goldcoin.abi, provider);
 
-  const sym = await goldcoinInst.symbol()
+  const sym = await goldcoinInst.symbol();
+  const decimals = await goldcoinInst.decimals();// 18n
+  const tokenBalcInWei = await goldcoinInst.balanceOf(userAddr);
+  const tokenBalc = formatUnits(tokenBalcInWei, decimals);
 
-  const decimals = await goldcoinInst.decimals()
-  // 18n
-
-  const tokenBalcRaw = await goldcoinInst.balanceOf(userAddr)
-
-  // Format the balance for humans, such as in a UI
-  const tokenBalc = formatUnits(tokenBalcRaw, decimals)
-
-  console.log('success,', sym, decimals, tokenBalcRaw, tokenBalc);
+  lg('success,', sym, decimals, tokenBalcInWei, tokenBalc);
   return tokenBalc;
+}
+export const erc20Allowance = async (input: TxnInput): string => {
+  const addr1 = input.addr1;
+  const addr2 = input.addr2;
+  lg('erc20Allowance()... addr1:', addr1, ', addr2:', addr2);
+  if(isEmpty(addr1) || isEmpty(addr2) || isEmpty(input.ctrtAddr)){
+    return 'input invalid';
+  }
+  const goldcoinInst = new Contract(input.ctrtAddr, goldcoin.abi, provider);
+
+  const allowanceInWei = await goldcoinInst.allowance(addr1, addr2);
+  const decimals = await goldcoinInst.decimals();// 18n
+  const allowanceInEth = formatUnits(allowanceInWei, decimals);
+
+  lg('success,', allowanceInWei, allowanceInEth);
+  return allowanceInEth;
+}
+
+export const erc20Transfer = async (input: TxnInput): string => {
+  const addrTo = input.addr2;
+  const amt = input.amount1;
+  lg('erc20Transfer()... addrTo:', addrTo, ', amt:', amt);
+  if(isEmpty(addrTo) || isEmpty(amt) || isEmpty(input.ctrtAddr)){
+    return 'input invalid';
+  }
+  const goldcoinInst = new Contract(input.ctrtAddr, goldcoin.abi, signer);
+  const amountInWei = parseUnits(amt, 18);
+  const tx = await goldcoinInst.transfer(addrTo, amountInWei);
+  await tx.wait();
+
+  lg('success');
+  return '';
+}
+
+export const erc20Approve = async (input: TxnInput): string => {
+  const addr2 = input.addr2;
+  const amt = input.amount1;
+  lg('erc20Approve()... addr2:', addr2, ', amt:', amt);
+  if(isEmpty(addr2) || isEmpty(amt) || isEmpty(input.ctrtAddr)){
+    return 'input invalid';
+  }
+  const goldcoinInst = new Contract(input.ctrtAddr, goldcoin.abi, signer);
+  const amountInWei = parseUnits(amt, 18);
+  const tx = await goldcoinInst.transfer(addr2, amountInWei);
+  await tx.wait();
+
+  lg('success');
+  return '';
+}
+
+//----------------== ERC721
+export const erc721Transfer = async (input: TxnInput): string => {
+  const addr1 = input.addr1;
+  const addr2 = input.addr2;
+  const tokenId = input.amount1;
+  lg('erc20Allowance()... addr1:', addr1, ', addr2:', addr2, ', tokenId:', tokenId);
+  if(isEmpty(addr1) || isEmpty(addr2) || isEmpty(tokenId) || isEmpty(input.ctrtAddr)){
+    return 'input invalid';
+  }
+  try {
+    const dragonNftInst = new Contract(input.ctrtAddr, dragonNft.abi, signer);
+    const sym = await dragonNftInst.name();
+    lg('symbol', sym);
+    if(sym !== 'Dragons'){
+      return 'invalid contract'
+    }
+    const tx = await dragonNftInst.safeTransferFrom(addr1, addr2, tokenId);
+    await tx.wait();
+  } catch (error) {
+    console.error('@erc721Transfer:', error);
+    return 'invocation failed';
+  }
+  lg('success');
+  return '';
+}
+export const erc721BalanceOf = async (input: TxnInput): string => {
+  const userAddr = input.addr1;
+  lg('erc20BalanceOf()... userAddr:', userAddr);
+  if(isEmpty(userAddr) || isEmpty(input.ctrtAddr)){
+    return 'input invalid';
+  }
+  const dragonNftInst = new Contract(input.ctrtAddr, dragonNft.abi, provider);
+  const sym = await dragonNftInst.name();
+  lg('symbol', sym);
+  if(sym !== 'Dragons'){
+    return 'invalid contract'
+  }
+  const tokenBalcInWei = await dragonNftInst.balanceOf(userAddr);
+  lg('success,', tokenBalcInWei);
+  return tokenBalcInWei;
 }

@@ -80,3 +80,10 @@ export const getChainStr = (chainObj: any) => {
 export const capitalizeFirst = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
+
+export const isEmpty = (value) =>
+  value === undefined ||
+  value === null ||
+  (typeof value === 'object' && Object.keys(value).length === 0) ||
+  (typeof value === 'string' && value.trim().length === 0) ||
+  (typeof value === 'string' && value === 'undefined');

@@ -78,13 +78,13 @@
 	</label>
 	<label class="label">
 		<span>Email</span>
-		<input class="input" type="text" placeholder="Enter email here..." bind:value={user.email} />
+		<input class="input" type="email" placeholder="Enter email here..." bind:value={user.email} />
 	</label>
 	<label class="label">
 		<span>Password</span>
 		<input
 			class="input"
-			type="text"
+			type="password"
 			placeholder="Enter password here..."
 			bind:value={user.password}
 		/>
