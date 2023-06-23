@@ -13,18 +13,20 @@
   let ethBalance = '';
   let tokenBalance = '';
   let nftBalance = '';
+  let txnHash_transfer20 = '';
+  let txnHash_transfer721 = '';
+  let txnHash_approve20 = '';
   let tokenAllowance = '';
 	let nativeBalance: any = '';
 	let tokenBalances: any = '';
 	let nftmetadata: any = '';
 	let items: any[] = [];
+	let chainDetected = '';
+	let addrDetected = '';
+	let receipt = '';
 	//------------------------==
 	export let pagetype = 'Ethereum Related Chains';
   export let ctrtName = 'goldcoin';
-	let chainDetected = '';
-	let addrDetected = '';
-	let approveResult = '';
-	let receipt = '';
 	let res: any;
 	let t: ToastSettings;
 	let data: any;
@@ -63,19 +65,33 @@
 		lg('onMount');
 		isOnMount = true;
 		lg('isOnMount:', isOnMount);
+    chainDetected = capitalizeFirst('unknown');
+
     const out = await ethersInit();
-    addrDetected = out[1];
+    if (out.err) {
+      t = getToastErr(JSON.stringify(out.err));
+			toastStore.trigger(t);
+			return true;
+		}
+    if (out.warn) {
+      t = getToastWarn(JSON.stringify(out.warn));
+			toastStore.trigger(t);
+			return true;
+		}
+		t = getToastOk('web3 initialized successfully!');
+		toastStore.trigger(t);
+
+    addrDetected = out.account;
     input.addr1 = addrDetected;
-    //input.ctrtAddr = goldcoin.address;
 		lg('input.addr1: ', input.addr1, ', input.addr2: ', input.addr2);
-    const [chainObj, chainStr] = getChainObj(out[0]);
+    const [chainObj, chainStr] = getChainObj(out.chainId);
     lg('chainObj:', chainObj, ', chainStr:', chainStr);
     chainDetected = capitalizeFirst(chainStr);
   });
   $: {
     input.ctrtAddr = getCtrtAddr(ctrtName);
   }
-  export const getCtrtAddr = (ctrtName: string) => {
+  export const getCtrtAddr = (ctrtName: string): string => {
     let ctrtAddr = '';
     switch (ctrtName) {
       case 'goldcoin':
@@ -86,7 +102,7 @@
         break;
     }
     lg('getCtrtAddr()... ctrtAddr', ctrtAddr);
-    return 	ctrtAddr;
+    return ctrtAddr;
 	};
 
   export const getToastErr = (err: string): ToastSettings => {
@@ -96,10 +112,17 @@
 			timeout: 5000
 		};
 	};
-	export const getToastOk = (): ToastSettings => {
+	export const getToastOk = (mesg: string = 'Transaction processed successfully!'): ToastSettings => {
 		return {
-			message: 'Transaction processed successfully!',
+			message: 'Success. '+ mesg,
 			background: 'variant-filled-success',
+			timeout: 5000
+		};
+	};
+	export const getToastWarn = (mesg: string = ''): ToastSettings => {
+		return {
+			message: 'Warn: '+ mesg,
+			background: 'variant-filled-warning',
 			timeout: 5000
 		};
 	};
@@ -139,73 +162,107 @@
 		lg('hErc20Transfer() ... input:', input);
 		hErc20Transfer_loading = true;
 		const out = await erc20Transfer(input);
-    if (out) {
-      t = getToastErr(JSON.stringify(out));
+    if (out.err) {
+      t = getToastErr(JSON.stringify(out.err));
 			toastStore.trigger(t);
       hErc20Transfer_loading = false;
 			return true;
 		}
-		t = getToastOk();
+		t = getToastOk('');
 		toastStore.trigger(t);
-		//receipt = JSON.stringify(res.txn, null, 2);
+    txnHash_transfer20 = out.txnHash;
 		hErc20Transfer_loading = false;
 	};
 	const hErc20Approve = async (input: TxnInput) => {
 		lg('hErc20Approve() ... input:', input);
 		hErc20Approve_loading = true;
 		const out = await erc20Approve(input);
-    if (out) {
-      t = getToastErr(JSON.stringify(out));
+    if (out.err) {
+      t = getToastErr(JSON.stringify(out.err));
 			toastStore.trigger(t);
       hErc20Approve_loading = false;
 			return true;
 		}
-		t = getToastOk();
+		t = getToastOk('');
 		toastStore.trigger(t);
-		//receipt = JSON.stringify(res.txn, null, 2);
+		txnHash_approve20 = out.txnHash;
 		hErc20Approve_loading = false;
 	};
   const hErc721Transfer = async (input: TxnInput) => {
 		lg('hErc721Transfer() ... input:', input);
 		hErc721Transfer_loading = true;
 		const out = await erc721Transfer(input);
-    if (out) {
-      t = getToastErr(JSON.stringify(out));
+    if (out.err) {
+      t = getToastErr(JSON.stringify(out.err));
 			toastStore.trigger(t);
       hErc721Transfer_loading = false;
 			return true;
 		}
-		t = getToastOk();
+		t = getToastOk('');
 		toastStore.trigger(t);
-		//receipt = JSON.stringify(res.txn, null, 2);
+		txnHash_transfer721 = out.txnHash;
 		hErc721Transfer_loading = false;
 	};
 	const handleEthBalance = async (input: TxnInput) => {
 		lg('handleEthBalance() ... input:', input);
     ethBalance_loading = true;
-    const balns = await getBalanceEth(input.addr1);
-    lg('balances:', balns);
-    ethBalance = balns[0];
+    const out = await getBalanceEth(input.addr1);
+    if (out.err) {
+      t = getToastErr(JSON.stringify(out.err));
+			toastStore.trigger(t);
+      ethBalance_loading = false;
+			return true;
+		}
+		t = getToastOk('balance: '+ out.str);
+		toastStore.trigger(t);
+    ethBalance = out.str;
     ethBalance_loading = false;
 	};
 	const hErc20BalanceOf = async (input: TxnInput) => {
 		lg('hErc20BalanceOf() ... input:', input);
     hErc20BalanceOf_loading = true;
-    tokenBalance = await erc20BalanceOf(input);
+    const out = await erc20BalanceOf(input);
+    if (out.err) {
+      t = getToastErr(JSON.stringify(out.err));
+			toastStore.trigger(t);
+      hErc20BalanceOf_loading = false;
+			return true;
+		}
+		t = getToastOk('balance: '+ out.str);
+		toastStore.trigger(t);
+    tokenBalance = out.str;
     lg('tokenBalance:', tokenBalance);
     hErc20BalanceOf_loading = false;
 	};
 	const hErc721BalanceOf = async (input: TxnInput) => {
 		lg('hErc721BalanceOf() ... input:', input);
     hErc721BalanceOf_loading = true;
-    nftBalance = await erc721BalanceOf(input);
+    const out = await erc721BalanceOf(input);
+    if (out.err) {
+      t = getToastErr(JSON.stringify(out.err));
+			toastStore.trigger(t);
+      hErc721BalanceOf_loading = false;
+			return true;
+		}
+		t = getToastOk('balance: '+ out.str);
+		toastStore.trigger(t);
+    nftBalance = out.str;
     lg('nftBalance:', nftBalance);
     hErc721BalanceOf_loading = false;
 	};
 	const hErc20Allowance = async (input: TxnInput) => {
 		lg('hErc20Allowance() ... input:', input);
     tokenAllowance_loading = true;
-    tokenAllowance = await erc20Allowance(input);
+    const out = await erc20Allowance(input);
+    if (out.err) {
+      t = getToastErr(JSON.stringify(out.err));
+			toastStore.trigger(t);
+      tokenAllowance_loading = false;
+			return true;
+		}
+		t = getToastOk('allowance: '+ out.str);
+		toastStore.trigger(t);
+    tokenAllowance = out.str;
     lg('tokenAllowance:', tokenAllowance);
     tokenAllowance_loading = false;
 	};
@@ -442,6 +499,9 @@
 				>Transfer ERC20 Tokens</button
 			>
 		{/if}
+    <div class="mt-2 ml-2">
+			Txn Hash: {txnHash_transfer20}
+		</div>
 	</div>
 
 	<div class="flex flex-row">
@@ -458,8 +518,8 @@
 				>Approve ERC20 Allowance</button
 			>
 		{/if}
-		<div class="mt-2 ml-2">
-			{approveResult}
+    <div class="mt-2 ml-2">
+			Txn Hash: {txnHash_approve20}
 		</div>
 	</div>
 
@@ -503,5 +563,8 @@
 				>Transfer 1 ERC721 NFT</button
 			>
 		{/if}
+    <div class="mt-2 ml-2">
+			Txn Hash: {txnHash_transfer721}
+		</div>
 	</div>
 </div>

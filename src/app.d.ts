@@ -13,6 +13,21 @@ declare class NftMetadataM {
   amount: number
   metadata: any
 }
+declare class Web3InitOutput {
+  err: string
+  warn: string
+  chainId: string
+  account: string
+}
+declare class ReadOutput {
+  err: string
+  str: string
+  str2: string
+}
+declare class TxnOutput {
+  err: string
+  txnHash: string
+}
 declare class TxnInput {
   chainName: string
   ctrtAddr: string
