@@ -6,7 +6,11 @@
 
 `npm install` or `pnpm install` or `yarn`
 
-To start a development server:
+## Notice
+Keep the package vite at version 4.3.9 to avoid this error: "Error starting new project - @layer base is used but no matching @tailwind base directive is present."
+https://github.com/skeletonlabs/skeleton/issues/1731
+
+## To start a development server:
 
 ```bash
 npm run dev
