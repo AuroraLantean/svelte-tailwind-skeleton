@@ -58,7 +58,7 @@ export const logoutUser = async () => {
   updateDbInfo('jwt', '');
 }
 // loginUser
-export const loginUser = async (user: User): UserInfo => {
+export const loginUser = async (user: User): Promise<UserInfo> => {
   console.log('loginUser()... user:', user);
   console.log('pocketbaseURL:', pocketbaseURL);
   const pb = new PocketBase(pocketbaseURL);
@@ -69,7 +69,14 @@ export const loginUser = async (user: User): UserInfo => {
     console.log('authData:', authData);
     // after the above you can also access the auth data from the authStore
     const jwt = pb.authStore.token;
-    const uid = pb.authStore.model.id;
+    const uid = pb.authStore.model?.id;
+    if (!uid) {
+      return {
+        id: "undefined",
+        token: "",
+        isValid: false,
+      };
+    }
     console.log(pb.authStore.isValid);
     //console.log(jwt);
     console.log('uid:', uid);
@@ -94,7 +101,7 @@ export const loginUser = async (user: User): UserInfo => {
 }
 
 // getUsers
-export const getUsers = async (): User[] => {
+export const getUsers = async (): Promise<User[]> => {
   console.log('getUsers()...');
   //console.log('pocketbaseURL:', pocketbaseURL);
   const pb = new PocketBase(pocketbaseURL);
@@ -106,7 +113,7 @@ export const getUsers = async (): User[] => {
     });*/
 
     // you can also fetch all records at once via getFullList
-    const records = await pb.collection('users').getFullList(10,{
+    const records = await pb.collection('users').getFullList(10, {
       sort: '-created',
     });
     console.log('records:', records)
@@ -150,7 +157,7 @@ export const getUsers = async (): User[] => {
   }
 }
 // getUser
-export const getUser = async (id: string): User => {
+export const getUser = async (id: string): Promise<User> => {
   console.log('getUser()... id:', id);
   console.log('pocketbaseURL:', pocketbaseURL);
   const pb = new PocketBase(pocketbaseURL);
